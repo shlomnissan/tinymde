@@ -1,5 +1,5 @@
-let TinyMDE = window.TinyMDE.default;
-let TinyMDEInstance = new TinyMDE();
+const TinyMDE = window.TinyMDE.default;
+const TinyMDEInstance = new TinyMDE();
 
 console.log("TinyMDE", TinyMDEInstance);
 
