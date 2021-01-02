@@ -1,0 +1,17 @@
+#tinymde-root {
+    border: 1px solid black;
+}
+
+#tinymde-toolbar {
+    border: 1px solid black;
+    border-width: 0 0 1px 0;
+    height: 25px;
+    padding: 8px;
+    display: flex;
+}
+
+#tinymde-editor {
+    height: 200px;
+    padding: 8px;
+    outline: 0px;
+}

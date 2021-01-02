@@ -1,11 +1,15 @@
-class TinyMDE {
-    constructor() {
-        console.log("TinyMDE constructor is called!");
-    }
+import Editor from "./editor";
+import Toolbar from "./toolbar";
 
-    sayHello = () => {
-        console.log("Hello!");
-    };
-}
+const TinyMDE = function (editorSelector) {
+    const root = document.querySelector(editorSelector);
+    if (!root) {
+        console.error(`'${editorSelector}' isn't a valid selector.`);
+        return;
+    }
+    root.id = "tinymde-root";
+    new Toolbar(root);
+    new Editor(root);
+};
 
 export default TinyMDE;

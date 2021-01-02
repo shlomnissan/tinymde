@@ -26,6 +26,9 @@ module.exports = {
     mode: "production",
     devtool: 'source-map',
     entry: './src/index.js',
+    devServer: {
+        port: 9000
+    },
     output: {
         filename: 'index.js',
         path: path.resolve(__dirname, 'build'),
@@ -58,7 +61,14 @@ module.exports = {
         ]
     },
     plugins: [
-        new PrettierPlugin(),
+        new PrettierPlugin({
+            printWidth: 80,
+            tabWidth: 4,
+            useTabs: false,
+            semi: true,
+            encoding: 'utf-8',
+            extensions: [ ".js", ".ts" ]
+        }),
         new webpack.BannerPlugin(banner)
     ]
 };
