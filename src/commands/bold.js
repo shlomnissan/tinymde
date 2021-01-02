@@ -1,18 +1,7 @@
-import makeButton from "../utils/make_button";
+const Bold = function () {};
 
-let button;
-
-const Bold = function () {
-    button = makeButton("Bold", "tinymde-bold");
-    button.onclick = execute;
-};
-
-Bold.prototype.getElement = () => {
-    return button;
-};
-
-const execute = () => {
-    // TODO: make bold
+Bold.prototype.execute = function (content) {
+    // TODO: execute bold
 };
 
 export default Bold;

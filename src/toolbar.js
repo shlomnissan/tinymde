@@ -1,16 +1,25 @@
-import Bold from "./commands/bold";
+import Commands from "./commands/commands";
+import makeButton from "./utils/make_button";
 
-let toolbar;
+const Toolbar = function (root, handleCommand) {
+    this.handleCommand = handleCommand;
+    this.toolbar = document.createElement("div");
+    this.toolbar.id = "tinymde-toolbar";
+    root.append(this.toolbar);
+    renderToolbar.call(this);
+};
 
-const Toolbar = function (root) {
-    toolbar = document.createElement("div");
-    toolbar.id = "tinymde-toolbar";
-    root.append(toolbar);
-    renderToolbar(toolbar);
+Toolbar.prototype.onclick = function (cmd) {
+    this.handleCommand(cmd);
 };
 
 function renderToolbar() {
-    toolbar.append(new Bold().getElement());
+    const _this = this;
+    Object.keys(Commands).forEach((cmd) => {
+        const button = makeButton(Commands[cmd].label, Commands[cmd].id);
+        button.onclick = () => _this.handleCommand(Commands[cmd]);
+        _this.toolbar.append(button);
+    });
 }
 
 export default Toolbar;
