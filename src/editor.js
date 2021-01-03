@@ -3,6 +3,11 @@ import Bold from "./commands/bold";
 
 import "./style/index.css";
 
+/**
+ * Editor object.
+ * @constructor
+ * @param {HTMLDivElement} root - The root HTML object.
+ */
 const Editor = function (root) {
     this.editor = document.createElement("div");
     this.editor.id = "tinymde-editor";
@@ -11,10 +16,18 @@ const Editor = function (root) {
     initCommands.call(this);
 };
 
+/**
+ * Inserts/replaces content.
+ * @param {string} content - the new content.
+ */
 Editor.prototype.setContent = function (content) {
     this.editor.innerText = content;
 };
 
+/**
+ * Executes command.
+ * @param {Command} cmd - { id: string, label: string }.
+ */
 Editor.prototype.executeCommand = function (cmd) {
     this.editor.focus();
     switch (cmd) {
@@ -24,6 +37,9 @@ Editor.prototype.executeCommand = function (cmd) {
     }
 };
 
+/**
+ * Instantiate command execution objects.
+ */
 function initCommands() {
     this.bold = new Bold();
 }

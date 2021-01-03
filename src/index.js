@@ -1,10 +1,14 @@
 import Editor from "./editor";
 import Toolbar from "./toolbar";
 
-// private members
 let editor;
 let toolbar;
 
+/**
+ * TinyMDE object.
+ * @constructor
+ * @param {string} editorSelector - The class name or id of the root container.
+ */
 const TinyMDE = function (editorSelector) {
     const root = document.querySelector(editorSelector);
     if (!root) {
@@ -16,10 +20,18 @@ const TinyMDE = function (editorSelector) {
     editor = new Editor(root);
 };
 
+/**
+ * Inserts/replaces content throught the Editor object.
+ * @param {string} content - the new content.
+ */
 TinyMDE.prototype.setContent = function (content) {
     editor.setContent(content);
 };
 
+/**
+ * Executes command through the Editor object.
+ * @param {Command} cmd - { id: string, label: string }.
+ */
 TinyMDE.prototype.handleCommand = function (cmd) {
     editor.executeCommand(cmd);
 };

@@ -1,6 +1,6 @@
 const Bold = function () {};
 
-Bold.prototype.execute = function (content) {
+Bold.prototype.execute = function () {
     // TODO: execute bold
 };
 
