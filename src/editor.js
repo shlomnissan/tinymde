@@ -30,6 +30,11 @@ Editor.prototype.setContent = function (content) {
  */
 Editor.prototype.executeCommand = function (cmd) {
     this.editor.focus();
+
+    // 1. add a getRange function
+    // 2. add a setSelection function
+    // 3. pass this to bold
+
     switch (cmd) {
         case Commands.BOLD:
             this.bold.execute();
