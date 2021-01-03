@@ -1,14 +1,12 @@
 {
   "name": "@shlomnissan/tinymde",
   "version": "0.0.1",
-  "description": "Simple Markdown WYSIWYG",
+  "description": "Simple markdown editor written in plain JavaScript",
   "main": "build/index.js",
   "scripts": {
     "build": "webpack",
     "dev": "webpack --mode development --watch --progress",
-    "test": "jest",
-    "prepare": "npm run build",
-    "trypublish": "npm publish || true"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
