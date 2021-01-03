@@ -1,13 +1,10 @@
 /**
- * Returns the position of the surrounding word based on the cursor's location
- * @param {string} text - The full text
- * @param {position} number - The cursor's location
+ * Returns the position of the surrounding word based on the cursor's location.
+ * @param {string} text - The full text.
+ * @param {number} position - The cursor's location.
+ * @return {number, number} - Start/end offset.
  */
 export default function getSurroundingWord(text, position) {
-    if (!text) {
-        console.error("Text parameter can't be empty.");
-    }
-
     const isWordDelimiter = (c) => {
         return c === " " || c.charCodeAt(0) === 10 || c.charCodeAt(0) === 160;
     };
@@ -19,7 +16,7 @@ export default function getSurroundingWord(text, position) {
             break;
         }
     }
-    
+
     let end = text.length;
     for (let i = position; i < text.length; i++) {
         if (isWordDelimiter(text[i])) {

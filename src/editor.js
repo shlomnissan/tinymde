@@ -1,5 +1,6 @@
 import Commands from "./commands/commands";
 import Bold from "./commands/bold";
+import getTextState from "./utils/get_text_state";
 
 import "./style/index.css";
 
@@ -21,7 +22,7 @@ const Editor = function (root) {
  * @param {string} content - the new content.
  */
 Editor.prototype.setContent = function (content) {
-    this.editor.innerText = content;
+    this.editor.innerHTML = content;
 };
 
 /**
@@ -30,14 +31,10 @@ Editor.prototype.setContent = function (content) {
  */
 Editor.prototype.executeCommand = function (cmd) {
     this.editor.focus();
-
-    // 1. add a getRange function
-    // 2. add a setSelection function
-    // 3. pass this to bold
-
+    const textState = getTextState(this.editor);
     switch (cmd) {
         case Commands.BOLD:
-            this.bold.execute();
+            this.bold.execute(this.editor, textState);
             break;
     }
 };
