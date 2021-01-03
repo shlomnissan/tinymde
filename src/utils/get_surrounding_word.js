@@ -2,7 +2,7 @@
  * Returns the position of the surrounding word based on the cursor's location.
  * @param {string} text - The full text.
  * @param {number} position - The cursor's location.
- * @return {number, number} - Start/end offset.
+ * @return {Object} - { start: number, end: number }.
  */
 export default function getSurroundingWord(text, position) {
     const isWordDelimiter = (c) => {

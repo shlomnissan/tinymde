@@ -7,7 +7,7 @@ const Bold = function () {};
 /**
  * Add bold markdown to current word and select it.
  * @param {HTMLDivElement} editor - contentEditable div tag.
- * @param {text: string, position: number} textState - text selection and cursor position.
+ * @param {Object} textState - { text: string, position: number }
  */
 Bold.prototype.execute = function (editor, textState) {
     const wordOffset = getSurroundingWord(textState.text, textState.position);

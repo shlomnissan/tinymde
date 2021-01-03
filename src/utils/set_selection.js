@@ -2,7 +2,7 @@ import getRange from "./get_range";
 
 /**
  * Make a dynamic text selection in the currently selected range.
- * @param {start: number, end: number} - selection range.
+ * @param {Object} - { start: number, end: number }.
  */
 export default function setSelection({ start, end }) {
     const range = getRange();

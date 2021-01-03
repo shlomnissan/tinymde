@@ -27,7 +27,7 @@ Editor.prototype.setContent = function (content) {
 
 /**
  * Executes command.
- * @param {Command} cmd - { id: string, label: string }.
+ * @param {Object} cmd - { id: string, label: string }.
  */
 Editor.prototype.executeCommand = function (cmd) {
     this.editor.focus();

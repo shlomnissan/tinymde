@@ -3,7 +3,7 @@ import getRange from "./get_range";
 /**
  * Returns the text and cursor's position.
  * @param {HTMLDivElement} editor - contentEditable div tag.
- * @return {text: string, position: number} - Text selection and cursor position.
+ * @return {Object} - {text: string, position: number}.
  */
 export default function getTextState(editor) {
     const range = getRange();

@@ -16,7 +16,7 @@ const Toolbar = function (root, handleCommand) {
 
 /**
  * Renders toolbar buttons.
- * @param {Commands} cmd - { COMMAND: { id: string, label: string }}.
+ * @param {Object[]} commands - [ command: { id: string label: string } ].
  */
 function renderToolbar(commands) {
     Object.keys(commands).forEach((cmd) => {

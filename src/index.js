@@ -30,7 +30,7 @@ TinyMDE.prototype.setContent = function (content) {
 
 /**
  * Executes command through the Editor object.
- * @param {Command} cmd - { id: string, label: string }.
+ * @param {Object} cmd - { id: string, label: string }.
  */
 TinyMDE.prototype.handleCommand = function (cmd) {
     editor.executeCommand(cmd);
