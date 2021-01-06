@@ -1,6 +1,8 @@
 import Commands from "./commands/commands";
+import { getTextState } from "./utils/textarea";
+
 import Bold from "./commands/bold";
-import getTextState from "./utils/get_text_state";
+import Header from "./commands/header";
 
 import "./style/index.css";
 
@@ -14,7 +16,6 @@ const Editor = function (root) {
     this.editor.id = "tinymde-editor";
     this.editor.contentEditable = true;
     root.append(this.editor);
-    initCommands.call(this);
 };
 
 /**
@@ -30,20 +31,15 @@ Editor.prototype.setContent = function (content) {
  * @param {Object} cmd - { id: string, label: string }.
  */
 Editor.prototype.executeCommand = function (cmd) {
-    this.editor.focus();
     const textState = getTextState(this.editor);
     switch (cmd) {
         case Commands.BOLD:
-            this.bold.execute(this.editor, textState);
+            Bold.execute(this.editor, textState);
+            break;
+        case Commands.HEADER:
+            Header.execute(this.editor, textState, 1);
             break;
     }
 };
-
-/**
- * Instantiate command execution objects.
- */
-function initCommands() {
-    this.bold = new Bold();
-}
 
 export default Editor;
