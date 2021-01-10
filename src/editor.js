@@ -4,7 +4,7 @@ import { getTextState } from "./utils/textarea";
 import Bold from "./commands/bold";
 import Header from "./commands/header";
 
-import "./style/index.css";
+import "./style/theme.less";
 
 /**
  * Editor object.
@@ -15,6 +15,7 @@ const Editor = function (root) {
     this.editor = document.createElement("div");
     this.editor.id = "tinymde-editor";
     this.editor.contentEditable = true;
+    this.editor.spellcheck = false;
     root.append(this.editor);
 };
 

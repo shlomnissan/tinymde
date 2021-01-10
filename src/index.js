@@ -16,8 +16,8 @@ const TinyMDE = function (editorSelector) {
         return;
     }
     root.id = "tinymde-root";
-    toolbar = new Toolbar(root, this.handleCommand);
     editor = new Editor(root);
+    toolbar = new Toolbar(root, this.handleCommand);
 };
 
 /**

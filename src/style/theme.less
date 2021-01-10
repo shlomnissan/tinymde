@@ -1,0 +1,95 @@
+@color-background: #F7F7F7;
+@color-border: #E2E1E5;
+@color-highlight: #24BBF2;
+@color-text-blend: #A9A9A9;
+
+@2px: 2px;
+@4px: 4px;
+@8px: 8px;
+@16px: 16px;
+
+@font-face {
+    font-family: "editor-regular";
+    src: url("../fonts/ia-writer/iAWriterMonoS-Regular.woff") format("woff");
+}
+
+@font-face {
+    font-family: "editor-bold";
+    src: url("../fonts/ia-writer/iAWriterMonoS-Bold.woff") format("woff");
+}
+
+@font-face {
+    font-family: "editor-italic";
+    src: url("../fonts/ia-writer/iAWriterMonoS-Italic.woff") format("woff");
+}
+
+#tinymde-root {
+    border: 1px solid @color-border;
+    background-color: @color-background;
+    border-radius: @4px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+
+    #tinymde-toolbar {
+        border: 1px solid @color-border;
+        border-width: 1px 0 0 0;
+        height: 25px;
+        padding: @8px;
+        display: flex;
+
+        .tinymde-command {
+            border: none;
+            background-color: transparent;
+            border-radius: 2px;
+            cursor: pointer;
+            outline: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 4px;
+            width: 28px;
+            height: 28px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: @color-text-blend;
+
+            &:hover {
+                background-color: black;
+            }
+        }
+        
+        .tinymde-cmd-bold {
+            -webkit-mask: url(../svg/bold.svg) no-repeat center;
+            mask: url(../svg/bold.svg) no-repeat center;
+        }
+
+        .tinymde-cmd-italic {
+            -webkit-mask: url(../svg/italic.svg) no-repeat center;
+            mask: url(../svg/italic.svg) no-repeat center;
+        }
+
+        .tinymde-cmd-strikethrough {
+            -webkit-mask: url(../svg/strikethrough.svg) no-repeat center;
+            mask: url(../svg/strikethrough.svg) no-repeat center;
+        }
+
+        .tinymde-cmd-header {
+            width: 50px;
+            -webkit-mask: url(../svg/header.svg) no-repeat center;
+            mask: url(../svg/header.svg) no-repeat center;
+        }
+    }
+
+    #tinymde-editor {
+        flex: 1;
+        font-family: "editor-regular";
+        font-size: 18px;
+        padding: @16px;
+        outline: 0px;
+        -webkit-font-smoothing: never;
+        overflow-y: scroll;
+    }
+}
+
