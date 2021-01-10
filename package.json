@@ -1,5 +1,5 @@
 {
-  "name": "@shlomnissan/tinymde",
+  "name": "tinymde",
   "version": "0.0.1",
   "description": "Simple markdown editor written in plain JavaScript",
   "main": "build/index.js",
