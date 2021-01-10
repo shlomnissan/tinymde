@@ -1,4 +1,3 @@
-import Commands from "./commands/commands";
 import { getTextState } from "./utils/textarea";
 
 import Bold from "./commands/bold";
@@ -33,11 +32,12 @@ Editor.prototype.setContent = function (content) {
  */
 Editor.prototype.executeCommand = function (cmd) {
     const textState = getTextState(this.editor);
+    console.log(cmd);
     switch (cmd) {
-        case Commands.BOLD:
+        case "bold":
             Bold.execute(this.editor, textState);
             break;
-        case Commands.HEADER:
+        case "header":
             Header.execute(this.editor, textState, 1);
             break;
     }

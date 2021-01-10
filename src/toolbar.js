@@ -1,5 +1,4 @@
-import Commands from "./commands/commands";
-import makeButton from "./utils/make_button";
+const commands = [["header"], ["bold", "italic", "strikethrough"]];
 
 /**
  * Toolbar object.
@@ -11,19 +10,34 @@ const Toolbar = function (root, handleCommand) {
     this.toolbar = document.createElement("div");
     this.toolbar.id = "tinymde-toolbar";
     root.append(this.toolbar);
-    renderToolbar.call(this, Commands);
+    renderToolbar.call(this);
 };
 
 /**
  * Renders toolbar buttons.
- * @param {Object[]} commands - [ command: { id: string label: string } ].
  */
-function renderToolbar(commands) {
-    Object.keys(commands).forEach((cmd) => {
-        const button = makeButton(Commands[cmd].label, Commands[cmd].id);
-        button.onclick = () => this.handleCommand(Commands[cmd]);
-        this.toolbar.append(button);
+function renderToolbar() {
+    commands.forEach((group) => {
+        const group_el = document.createElement("div");
+        group_el.classList = ["tinymde-cmd-group"];
+        group.forEach((command) => {
+            const button = makeButton(`tinymde-cmd-${command}`);
+            button.onclick = () => this.handleCommand(command);
+            group_el.append(button);
+        });
+        this.toolbar.append(group_el);
     });
+}
+
+/**
+ * Creates a simple HTML button.
+ * @param {string} className
+ * @return {HTMLButtonElement}
+ */
+function makeButton(className) {
+    const button = document.createElement("button");
+    button.className = `tinymde-command ${className}`;
+    return button;
 }
 
 export default Toolbar;
