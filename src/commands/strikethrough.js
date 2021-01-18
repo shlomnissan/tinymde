@@ -1,23 +1,23 @@
 import { getSurroundingWord, setSelection } from "../utils/textarea";
 import insertText from "../utils/insert_text";
 
-const Bold = function () {};
+const Strikethrough = function () {};
 
 /**
- * Toggle bold markdown to current word and select it.
+ * Toggle strikethrough markdown to current word and select it.
  * @param {HTMLDivElement} editor - contentEditable div tag.
  * @param {Object} textState - { text: string, position: number }
  */
-Bold.prototype.execute = function (editor, state) {
-    const regex = /(\*{2})(.*?)(\1)/g;
+Strikethrough.prototype.execute = function (editor, state) {
+    const regex = /(\~{1})(.*?)(\1)/g;
     const wordOffset = getSurroundingWord(state.text, state.position);
-    const mdOffset = 2;
+    const mdOffset = 1;
 
     let text = "";
     let selection = { start: 0, end: 0 };
 
     const addMarkdown = () => {
-        text = `**${word}**`;
+        text = `~${word}~`;
         selection = {
             start: wordOffset.start + mdOffset,
             end: wordOffset.end + mdOffset,
@@ -38,5 +38,5 @@ Bold.prototype.execute = function (editor, state) {
     setSelection(selection);
 };
 
-const Instance = new Bold();
+const Instance = new Strikethrough();
 export default Instance;

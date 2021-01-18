@@ -4,7 +4,7 @@ import insertText from "../utils/insert_text";
 const Header = function () {};
 
 /**
- * Add header markdown to current paragraph.
+ * Toggle header markdown to current paragraph.
  * @param {HTMLDivElement} editor - contentEditable div tag.
  * @param {Object} state - { text: string, position: number }
  * @param {number} size - 1, 2, ... 6
