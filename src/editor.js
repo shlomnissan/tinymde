@@ -28,17 +28,17 @@ Editor.prototype.setContent = function (content) {
 
 /**
  * Executes command.
- * @param {Object} cmd - { id: string, label: string }.
+ * @param {string} command
+ * @param {any} value
  */
-Editor.prototype.executeCommand = function (cmd) {
+Editor.prototype.executeCommand = function (command, value) {
     const textState = getTextState(this.editor);
-    console.log(cmd);
-    switch (cmd) {
+    switch (command) {
         case "bold":
             Bold.execute(this.editor, textState);
             break;
         case "header":
-            Header.execute(this.editor, textState, 1);
+            Header.execute(this.editor, textState, value);
             break;
     }
 };

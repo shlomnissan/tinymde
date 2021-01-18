@@ -1,9 +1,6 @@
 import Editor from "./editor";
 import Toolbar from "./toolbar";
 
-let editor;
-let toolbar;
-
 /**
  * TinyMDE object.
  * @constructor
@@ -16,8 +13,8 @@ const TinyMDE = function (editorSelector) {
         return;
     }
     root.id = "tinymde-root";
-    editor = new Editor(root);
-    toolbar = new Toolbar(root, this.handleCommand);
+    this.editor = new Editor(root);
+    toolbar = new Toolbar(root, this.handleCommand.bind(this));
 };
 
 /**
@@ -25,15 +22,16 @@ const TinyMDE = function (editorSelector) {
  * @param {string} content - the new content.
  */
 TinyMDE.prototype.setContent = function (content) {
-    editor.setContent(content);
+    this.editor.setContent(content);
 };
 
 /**
  * Executes command through the Editor object.
- * @param {Object} cmd - { id: string, label: string }.
+ * @param {string} command
+ * @param {any} value - optional value.
  */
-TinyMDE.prototype.handleCommand = function (cmd) {
-    editor.executeCommand(cmd);
+TinyMDE.prototype.handleCommand = function (command, value = null) {
+    this.editor.executeCommand(command, value);
 };
 
 export default TinyMDE;

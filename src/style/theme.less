@@ -1,7 +1,8 @@
 @color-background: #F7F7F7;
-@color-border: #E2E1E5;
-@color-highlight: #24BBF2;
-@color-text-blend: #A9A9A9;
+@color-background-alt: #FAFAFA;
+@color-border: #e2e1e5;
+@color-highlight: #24bbf2;
+@color-text-blend: #969696;
 
 @2px: 2px;
 @4px: 4px;
@@ -24,6 +25,7 @@
 }
 
 #tinymde-root {
+    font-smooth: never;
     border: 1px solid @color-border;
     background-color: @color-background;
     border-radius: @4px;
@@ -38,58 +40,92 @@
         height: 25px;
         padding: @8px;
         display: flex;
+        background-color: @color-background-alt;
 
         .tinymde-cmd-group {
             display: flex;
             border: 1px solid @color-border;
             border-width: 0 1px 0 0;
-            margin-right: @8px;
+            margin-left: @4px;
             user-select: none;
 
-            &:last-child {
-                border-width: 0px;                
+            &:first-child {
+                margin-left: 0px;
             }
 
-            .tinymde-command {
-                border: none;
-                background-color: transparent;
-                border-radius: 2px;
-                cursor: pointer;
-                outline: 0px;
+            &:last-child {
+                border-width: 0px;
+            }
+
+            .button-wrapper {
+                position: relative;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                margin-right: 4px;
-                width: 28px;
-                height: 28px;
-                background-repeat: no-repeat;
-                background-position: center;
-                background-color: @color-text-blend;
+                width: 25px;
+                margin-right: @4px;
+                color: @color-text-blend;
 
                 &:hover {
-                    background-color: black;
+                    color: @color-highlight;
                 }
-            }
 
-            .tinymde-cmd-bold {
-                -webkit-mask: url(../svg/bold.svg) no-repeat center;
-                mask: url(../svg/bold.svg) no-repeat center;
-            }
+                .tinymde-command {
+                    @size: 20px;
 
-            .tinymde-cmd-italic {
-                -webkit-mask: url(../svg/italic.svg) no-repeat center;
-                mask: url(../svg/italic.svg) no-repeat center;
-            }
+                    border: none;
+                    cursor: pointer;
+                    position: relative;
+                    outline: 0px;
+                    width: @size;
+                    height: @size;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-color: @color-text-blend;
 
-            .tinymde-cmd-strikethrough {
-                -webkit-mask: url(../svg/strikethrough.svg) no-repeat center;
-                mask: url(../svg/strikethrough.svg) no-repeat center;
-            }
+                    &:hover {
+                        background-color: @color-highlight; 
+                    }
+                }
 
-            .tinymde-cmd-header {
-                width: 50px;
-                -webkit-mask: url(../svg/header.svg) no-repeat center;
-                mask: url(../svg/header.svg) no-repeat center;
+                .tinymde-cmd-bold {
+                    -webkit-mask: url(../svg/bold.svg) no-repeat center;
+                    mask: url(../svg/bold.svg) no-repeat center;
+                }
+
+                .tinymde-cmd-italic {
+                    -webkit-mask: url(../svg/italic.svg) no-repeat center;
+                    mask: url(../svg/italic.svg) no-repeat center;
+                }
+
+                .tinymde-cmd-strikethrough {
+                    -webkit-mask: url(../svg/strikethrough.svg) no-repeat center;
+                    mask: url(../svg/strikethrough.svg) no-repeat center;
+                }
+
+                .tinymde-cmd-header {
+                    -webkit-mask: url(../svg/header.svg) no-repeat center;
+                    mask: url(../svg/header.svg) no-repeat center;
+                }
+
+                .options {
+                    display: grid;
+                    bottom: 30px;
+                    position: absolute;
+                    grid-template-columns: 25px 25px 25px;
+                    background-color: @color-background-alt;
+                    border: 1px solid @color-border;
+                    border-width: 0 0 1px 1px;
+
+                    .tinymde-command {
+                        background-color: transparent;
+                        border: 1px solid @color-border;
+                        font-family: "editor-regular";
+                        font-size: 13px;
+                        padding: 4px;
+                        border-width: 1px 1px 0 0;
+                    }
+                }
             }
         }
     }
@@ -104,4 +140,3 @@
         overflow-y: scroll;
     }
 }
-
