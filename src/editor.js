@@ -18,6 +18,9 @@ const Editor = function (root) {
     this.editor.contentEditable = true;
     this.editor.spellcheck = false;
     root.append(this.editor);
+
+    this.editor.focus();
+    // TODO: move caret to the end
 };
 
 /**

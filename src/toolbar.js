@@ -93,7 +93,8 @@ function makeOptions(command, button, optionsList, optionsType) {
     options.className = `options ${optionsType}`;
     Object.keys(optionsList).forEach((key) => {
         const button = makeButton(`${command}-option`, key);
-        button.onclick = () => this.handleCommand(command, optionsList[key]);
+        button.onclick = () =>
+            this.handleCommand(command, parseInt(optionsList[key]));
         options.append(button);
     });
     button.append(options);
