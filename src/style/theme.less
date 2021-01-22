@@ -1,5 +1,5 @@
 @color-background: #F7F7F7;
-@color-background-alt: #FAFAFA;
+@color-background-alt: #FCFCFC;
 @color-border: #e2e1e5;
 @color-highlight: #24bbf2;
 @color-text-blend: #969696;
@@ -35,19 +35,23 @@
     height: 100%;
 
     #tinymde-toolbar {
+        @height: 32px;
+
         border: 1px solid @color-border;
         border-width: 1px 0 0 0;
-        height: 25px;
-        padding: @8px;
+        height: @height;
+        padding: 0 @8px;
         display: flex;
         background-color: @color-background-alt;
 
         .tinymde-cmd-group {
             display: flex;
+            height: @height;
             border: 1px solid @color-border;
             border-width: 0 1px 0 0;
             margin-left: @4px;
             user-select: none;
+            height: 100%;
 
             &:first-child {
                 margin-left: 0px;
@@ -109,21 +113,36 @@
                 }
 
                 .options {
-                    display: grid;
+                    display: none;
                     bottom: 30px;
                     position: absolute;
-                    grid-template-columns: 25px 25px 25px;
                     background-color: @color-background-alt;
                     border: 1px solid @color-border;
                     border-width: 0 0 1px 1px;
+                    width: fit-content;
 
-                    .tinymde-command {
-                        background-color: transparent;
+                    &.show {
+                        display: grid;
+                        grid-template-columns: auto auto auto;
+                        grid-row-gap: 0px;
+                    }
+
+                    .button-wrapper {
+                        @size: 25px;
+                        margin: 0px;
+                        display: flex;
+                        height: @size;
+                        width: @size;
                         border: 1px solid @color-border;
-                        font-family: "editor-regular";
-                        font-size: 13px;
-                        padding: 4px;
                         border-width: 1px 1px 0 0;
+                        
+                        .tinymde-command {
+                            background-color: transparent;
+                            font-family: "editor-regular";
+                            font-size: 13px;
+                            width: 100%;
+                            text-align: center;
+                        }
                     }
                 }
             }

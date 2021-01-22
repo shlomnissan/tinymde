@@ -36,7 +36,7 @@ const Toolbar = function (root, handleCommand) {
 function renderToolbar() {
     commands.forEach((group) => {
         const group_el = document.createElement("div");
-        group_el.classList = ["tinymde-cmd-group"];
+        group_el.classList.add("tinymde-cmd-group");
         group.forEach((command) => {
             if (typeof command === "object") {
                 Object.keys(command).forEach((label) => {
@@ -51,6 +51,21 @@ function renderToolbar() {
                         command[label].optionsType
                     );
                     group_el.append(button);
+                    group_el.onmouseover = () => {
+                        document
+                            .querySelectorAll(".options")
+                            .forEach((options) => {
+                                options.classList.remove("show");
+                            });
+                        group_el
+                            .querySelector(".options")
+                            .classList.add("show");
+                    };
+                    group_el.onmouseout = () => {
+                        group_el
+                            .querySelector(".options")
+                            .classList.remove("show");
+                    };
                 });
             } else {
                 const button = makeButton(`tinymde-cmd-${command}`);
