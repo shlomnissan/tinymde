@@ -30,6 +30,14 @@ const Toolbar = function (root, handleCommand) {
     renderToolbar.call(this);
 };
 
+Toolbar.prototype.hideToolbar = function () {
+    this.toolbar.classList.add("hide");
+};
+
+Toolbar.prototype.showToolbar = function () {
+    this.toolbar.classList.remove("hide");
+};
+
 /**
  * Renders toolbar buttons.
  */

@@ -29,18 +29,24 @@
     border: 1px solid @color-border;
     background-color: @color-background;
     border-radius: @4px;
+    overflow: hidden;
     display: flex;
-    flex: 1;
     flex-direction: column;
+    flex: 1;
     height: 100%;
 
     #tinymde-toolbar {
         @height: 32px;
+        transition: margin 300ms;
+
+        &.hide {
+            margin-bottom: -(@height + @2px * 2 + 1);
+        }
 
         border: 1px solid @color-border;
         border-width: 1px 0 0 0;
         height: @height;
-        padding: 0 @8px;
+        padding: @2px @8px;
         display: flex;
         background-color: @color-background-alt;
 
@@ -151,6 +157,7 @@
 
     #tinymde-editor {
         flex: 1;
+        height: 100%;
         font-family: "editor-regular";
         font-size: 16px;
         padding: @16px;

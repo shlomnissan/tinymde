@@ -1,4 +1,4 @@
-import { setSelection } from "../utils/textarea";
+import { setSelection, stripParagraphMarkdown } from "../utils/textarea";
 import insertText from "../utils/insert_text";
 
 const Header = function () {};
@@ -17,14 +17,15 @@ Header.prototype.execute = function (editor, state, size) {
     let cursor = { start: 0, end: 0 };
 
     const addMarkdown = () => {
-        text = `${"#".repeat(size)} ${state.text}`;
-        cursor = state.position + offset;
+        const stripped = stripParagraphMarkdown(state.text);
+        text = `${"#".repeat(size)} ${stripped.text}`;
+        cursor = state.position + offset - stripped.offset;
         setSelection({ start: 0, end: state.text.length });
     };
 
     const stripMarkdown = () => {
         text = state.text.substring(size + 1, state.text.length);
-        cursor = state.position - offset;
+        cursor = Math.max(state.position - offset, 0);
         setSelection({ start: 0, end: state.text.length });
     };
 

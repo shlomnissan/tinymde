@@ -17,10 +17,32 @@ const Editor = function (root) {
     this.editor.id = "tinymde-editor";
     this.editor.contentEditable = true;
     this.editor.spellcheck = false;
+    this.callbacks = {};
+
     root.append(this.editor);
+
+    this.editor.onkeypress = (event) => {
+        if ("onkeypress" in this.callbacks) {
+            this.callbacks.onkeypress(event);
+        }
+    };
+    this.editor.onmousemove = (event) => {
+        if ("onmousemove" in this.callbacks) {
+            this.callbacks.onmousemove(event);
+        }
+    };
 
     this.editor.focus();
     // TODO: move caret to the end
+};
+/**
+ * Propogate event listeners.
+ * Currently supporting onkeypress & onmousemove.
+ * @param  {string} event
+ * @param  {function} fn
+ */
+Editor.prototype.addEventListener = function (event, fn) {
+    this.callbacks[event] = fn;
 };
 
 /**
@@ -45,11 +67,11 @@ Editor.prototype.executeCommand = function (command, value) {
         case "italic":
             Italic.execute(this.editor, textState);
             break;
-        case "header":
-            Header.execute(this.editor, textState, value);
-            break;
         case "strikethrough":
             Strikethrough.execute(this.editor, textState);
+            break;
+        case "header":
+            Header.execute(this.editor, textState, value);
             break;
     }
 };

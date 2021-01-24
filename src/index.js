@@ -1,6 +1,11 @@
 import Editor from "./editor";
 import Toolbar from "./toolbar";
 
+const config = {
+    showToolbar: true,
+    toggleUI: true,
+};
+
 /**
  * TinyMDE object.
  * @constructor
@@ -13,8 +18,21 @@ const TinyMDE = function (editorSelector) {
         return;
     }
     root.id = "tinymde-root";
+    this.config = config;
     this.editor = new Editor(root);
-    toolbar = new Toolbar(root, this.handleCommand.bind(this));
+
+    if (this.config.showToolbar) {
+        this.toolbar = new Toolbar(root, this.handleCommand.bind(this));
+    }
+
+    if (this.config.toggleUI) {
+        this.editor.addEventListener("onkeypress", () => {
+            if (this.toolbar) this.toolbar.hideToolbar();
+        });
+        this.editor.addEventListener("onmousemove", () => {
+            if (this.toolbar) this.toolbar.showToolbar();
+        });
+    }
 };
 
 /**

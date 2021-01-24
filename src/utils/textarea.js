@@ -68,3 +68,20 @@ export function setSelection({ start, end }) {
     range.setEnd(range.endContainer, end);
     return range.cloneContents().textContent;
 }
+
+/**
+ * Strips paragraph markdown (headers, blockquote, list)
+ * @param {string} text - The paragraph's text
+ * @return {Object} - { text: string, offset: number }
+ */
+const regex = new RegExp(`^(\\#{1,6}\\s)(.*?)`, "g");
+export function stripParagraphMarkdown(text) {
+    if (text.match(regex)) {
+        const offset = text.match(regex)[0].length;
+        return {
+            text: text.substring(offset),
+            offset,
+        };
+    }
+    return { text, offset: 0 };
+}
