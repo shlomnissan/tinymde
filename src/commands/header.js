@@ -1,5 +1,5 @@
-import { setSelection, stripParagraphMarkdown } from "../utils/textarea";
-import insertText from "../utils/insert_text";
+import { setSelection, stripParagraphMarkdown } from "../utils/edit";
+import insertText from "../utils/text";
 
 const Header = function () {};
 

@@ -1,4 +1,4 @@
-import { getTextState } from "./utils/textarea";
+import { getTextState } from "./utils/edit";
 
 import Bold from "./commands/bold";
 import Italic from "./commands/italic";
@@ -31,13 +31,18 @@ const Editor = function (root) {
             this.callbacks.onmousemove(event);
         }
     };
+    this.editor.onkeyup = (event) => {
+        if ("onkeyup" in this.callbacks) {
+            this.callbacks.onkeyup(event);
+        }
+    };
 
     this.editor.focus();
     // TODO: move caret to the end
 };
 /**
  * Propogate event listeners.
- * Currently supporting onkeypress & onmousemove.
+ * Currently supporting onkeypress, onmousemove, onkeyup.
  * @param  {string} event
  * @param  {function} fn
  */

@@ -1,5 +1,5 @@
-import { getSurroundingWord, setSelection } from "../utils/textarea";
-import insertText from "../utils/insert_text";
+import { getSurroundingWord, setSelection } from "../utils/edit";
+import insertText from "../utils/text";
 
 const Strikethrough = function () {};
 
