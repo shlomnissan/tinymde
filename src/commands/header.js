@@ -34,5 +34,4 @@ Header.prototype.execute = function (editor, state, size) {
     setSelection({ start: cursor, end: cursor });
 };
 
-const Instance = new Header();
-export default Instance;
+export default new Header();

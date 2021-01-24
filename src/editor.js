@@ -50,7 +50,7 @@ Editor.prototype.addEventListener = function (event, fn) {
  * @param {string} content - the new content.
  */
 Editor.prototype.setContent = function (content) {
-    this.editor.innerHTML = content;
+    this.editor.innerText = content;
 };
 
 /**

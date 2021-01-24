@@ -38,5 +38,4 @@ Bold.prototype.execute = function (editor, state) {
     setSelection(selection);
 };
 
-const Instance = new Bold();
-export default Instance;
+export default new Bold();

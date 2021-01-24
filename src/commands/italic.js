@@ -38,5 +38,4 @@ Italic.prototype.execute = function (editor, state) {
     setSelection(selection);
 };
 
-const Instance = new Italic();
-export default Instance;
+export default new Italic();

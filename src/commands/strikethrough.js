@@ -38,5 +38,4 @@ Strikethrough.prototype.execute = function (editor, state) {
     setSelection(selection);
 };
 
-const Instance = new Strikethrough();
-export default Instance;
+export default new Strikethrough();
