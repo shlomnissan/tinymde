@@ -55,7 +55,7 @@ Toolbar.prototype.setWordCount = function (count) {
         wordCountEl.id = "tinymde-word-count";
         this.toolbar.append(wordCountEl);
     }
-    wordCountEl.innerHTML = `<p>Words: ${count}</p>`;
+    wordCountEl.innerHTML = `<p>${count} Words</p>`;
 };
 
 /**

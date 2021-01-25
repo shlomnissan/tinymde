@@ -7,7 +7,7 @@ import "./style/theme.less";
 const config = {
     showToolbar: true,
     showWordCount: true,
-    toggleUI: false,
+    toggleUI: true,
 };
 
 /**

@@ -24,11 +24,12 @@
     src: url("../fonts/ia-writer/iAWriterMonoS-Italic.woff") format("woff");
 }
 
+@font-default: "Helvetica", "Arial", sans-serif;
+
 #tinymde-root {
     font-smooth: never;
     border: 1px solid @color-border;
     background-color: @color-background;
-    border-radius: @4px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -37,7 +38,7 @@
 
     #tinymde-toolbar {
         @height: 32px;
-        transition: margin 300ms;
+        transition: margin 600ms;
 
         &.hide {
             margin-bottom: -(@height + @2px * 2 + 1);
@@ -59,8 +60,8 @@
             p {
                 width: 100%;
                 text-align: right;
-                font-family: "editor-regular";
-                font-size: 14px;
+                font-family: @font-default;
+                font-size: 13px;
                 color: @color-text-blend;
             }
         }
@@ -180,5 +181,16 @@
         -webkit-font-smoothing: never;
         overflow-y: scroll;
         caret-color: @color-highlight;
+        padding: 48px;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+        &::-webkit-scrollbar-track {
+            background-color: @color-background;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: @color-text-blend;
+        }
     }
 }
