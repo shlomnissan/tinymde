@@ -30,12 +30,32 @@ const Toolbar = function (root, handleCommand) {
     renderToolbar.call(this);
 };
 
+/**
+ * Hide toolbar, if it's showing, by adding the "hide" CSS class.
+ */
 Toolbar.prototype.hideToolbar = function () {
     this.toolbar.classList.add("hide");
 };
 
+/**
+ * Show toolbar, if it's hidden, by removing the "hide" CSS class.
+ */
 Toolbar.prototype.showToolbar = function () {
     this.toolbar.classList.remove("hide");
+};
+
+/**
+ * Renders word count if needed and update count.
+ * @param  {number} count
+ */
+Toolbar.prototype.setWordCount = function (count) {
+    let wordCountEl = this.toolbar.querySelector("#tinymde-word-count");
+    if (!wordCountEl) {
+        wordCountEl = document.createElement("div");
+        wordCountEl.id = "tinymde-word-count";
+        this.toolbar.append(wordCountEl);
+    }
+    wordCountEl.innerHTML = `<p>Words: ${count}</p>`;
 };
 
 /**

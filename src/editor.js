@@ -5,8 +5,6 @@ import Italic from "./commands/italic";
 import Strikethrough from "./commands/strikethrough";
 import Header from "./commands/header";
 
-import "./style/theme.less";
-
 /**
  * Editor object.
  * @constructor
@@ -37,6 +35,17 @@ const Editor = function (root) {
         }
     };
 
+    Object.defineProperty(this, "content", {
+        get: function () {
+            return this.editor.innerText;
+        },
+        set: function (val) {
+            this.editor.innerText = val;
+        },
+        configurable: false,
+        enumerable: false,
+    });
+
     this.editor.focus();
     // TODO: move caret to the end
 };
@@ -48,14 +57,6 @@ const Editor = function (root) {
  */
 Editor.prototype.addEventListener = function (event, fn) {
     this.callbacks[event] = fn;
-};
-
-/**
- * Inserts/replaces content.
- * @param {string} content - the new content.
- */
-Editor.prototype.setContent = function (content) {
-    this.editor.innerText = content;
 };
 
 /**

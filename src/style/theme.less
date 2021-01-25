@@ -50,6 +50,21 @@
         display: flex;
         background-color: @color-background-alt;
 
+        #tinymde-word-count {
+            display: flex;
+            align-self: flex-end;
+            align-items: center;
+            height: 100%;
+            flex: 1;
+            p {
+                width: 100%;
+                text-align: right;
+                font-family: "editor-regular";
+                font-size: 14px;
+                color: @color-text-blend;
+            }
+        }
+
         .tinymde-cmd-group {
             display: flex;
             height: @height;

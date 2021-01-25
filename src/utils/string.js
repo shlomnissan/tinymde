@@ -6,6 +6,7 @@ const exclusions = ["#", "##", "###", "####", "#####", "######", "*", "-"];
  * @return {number}
  */
 export function wordCount(str) {
+    str = str.replace(/\n/g, " ");
     const str_arr = str.split(" ");
     return str_arr.filter((word) => {
         word = trim(word);
