@@ -19,21 +19,8 @@ const Editor = function (root) {
 
     root.append(this.editor);
 
-    this.editor.onkeypress = (event) => {
-        if ("onkeypress" in this.callbacks) {
-            this.callbacks.onkeypress(event);
-        }
-    };
-    this.editor.onmousemove = (event) => {
-        if ("onmousemove" in this.callbacks) {
-            this.callbacks.onmousemove(event);
-        }
-    };
-    this.editor.onkeyup = (event) => {
-        if ("onkeyup" in this.callbacks) {
-            this.callbacks.onkeyup(event);
-        }
-    };
+    dispatchCallbacks(this.editor, this.callbacks);
+    clipboardPaste(this.editor);
 
     Object.defineProperty(this, "content", {
         get: function () {
@@ -81,5 +68,42 @@ Editor.prototype.executeCommand = function (command, value) {
             break;
     }
 };
+
+/**
+ * Registers event listeners and dispatch callbacks.
+ * @param  {Editor} editor
+ * @param  {string: function} callbacks
+ */
+function dispatchCallbacks(editor, callbacks) {
+    editor.onkeypress = (event) => {
+        if ("onkeypress" in callbacks) {
+            callbacks.onkeypress(event);
+        }
+    };
+    editor.onmousemove = (event) => {
+        if ("onmousemove" in callbacks) {
+            callbacks.onmousemove(event);
+        }
+    };
+    editor.onkeyup = (event) => {
+        if ("onkeyup" in callbacks) {
+            callbacks.onkeyup(event);
+        }
+    };
+}
+
+/**
+ * Listen to onpaste and insert plain text.
+ * @param  {Editor} editor
+ */
+function clipboardPaste(editor) {
+    editor.onpaste = (event) => {
+        event.preventDefault();
+        if (event.clipboardData) {
+            const text = event.clipboardData.getData("text/plain");
+            document.execCommand("insertText", false, text);
+        }
+    };
+}
 
 export default Editor;
