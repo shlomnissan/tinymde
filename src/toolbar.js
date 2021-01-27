@@ -14,6 +14,7 @@ const commands = [
                 optionsType: "grid",
             },
         },
+        "blockquote",
     ],
 ];
 
@@ -79,7 +80,7 @@ function renderToolbar() {
                         command[label].optionsType
                     );
                     group_el.append(button);
-                    group_el.onmouseover = () => {
+                    button.onmouseover = () => {
                         document
                             .querySelectorAll(".options")
                             .forEach((options) => {

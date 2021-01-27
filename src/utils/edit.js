@@ -74,10 +74,11 @@ export function setSelection({ start, end }) {
  * @param {string} text - The paragraph's text
  * @return {Object} - { text: string, offset: number }
  */
-const regex = new RegExp(`^(\\#{1,6}\\s)(.*?)`, "g");
+const regex = new RegExp(`^(\\#{1,6}\\s)|(\\>\\s)(.*?)`, "g");
 export function stripParagraphMarkdown(text) {
-    if (text.match(regex)) {
-        const offset = text.match(regex)[0].length;
+    const match = text.match(regex);
+    if (match) {
+        const offset = match[0].length;
         return {
             text: text.substring(offset),
             offset,

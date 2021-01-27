@@ -4,6 +4,7 @@ import Bold from "./commands/bold";
 import Italic from "./commands/italic";
 import Strikethrough from "./commands/strikethrough";
 import Header from "./commands/header";
+import Blockquote from "./commands/blockquote";
 
 /**
  * Editor object.
@@ -65,6 +66,9 @@ Editor.prototype.executeCommand = function (command, value) {
             break;
         case "header":
             Header.execute(this.editor, textState, value);
+            break;
+        case "blockquote":
+            Blockquote.execute(this.editor, textState);
             break;
     }
 };
