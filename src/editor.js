@@ -1,10 +1,12 @@
 import { getTextState } from "./utils/edit";
 
+import Shortcut from "./shortcuts";
 import Bold from "./commands/bold";
 import Italic from "./commands/italic";
 import Strikethrough from "./commands/strikethrough";
 import Header from "./commands/header";
 import Blockquote from "./commands/blockquote";
+import Link from "./commands/link";
 
 /**
  * Editor object.
@@ -22,6 +24,10 @@ const Editor = function (root) {
 
     dispatchCallbacks(this.editor, this.callbacks);
     clipboardPaste(this.editor);
+
+    Shortcut("tab", (event) => {
+        console.log("boo");
+    });
 
     Object.defineProperty(this, "content", {
         get: function () {
@@ -69,6 +75,9 @@ Editor.prototype.executeCommand = function (command, value) {
             break;
         case "blockquote":
             Blockquote.execute(this.editor, textState);
+            break;
+        case "link":
+            Link.execute(this.editor, textState);
             break;
     }
 };

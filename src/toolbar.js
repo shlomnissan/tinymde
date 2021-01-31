@@ -16,6 +16,7 @@ const commands = [
         },
         "blockquote",
     ],
+    ["link"],
 ];
 
 /**
