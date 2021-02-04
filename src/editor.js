@@ -25,8 +25,11 @@ const Editor = function (root) {
     dispatchCallbacks(this.editor, this.callbacks);
     clipboardPaste(this.editor);
 
-    Shortcut("tab", (event) => {
-        console.log("boo");
+    Shortcut("Tab", (event) => {});
+
+    Shortcut("ctrl+b", (event) => {
+        const textState = getTextState(this.editor);
+        Bold.execute(this.editor, textState);
     });
 
     Object.defineProperty(this, "content", {
