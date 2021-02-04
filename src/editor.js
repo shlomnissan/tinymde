@@ -25,7 +25,9 @@ const Editor = function (root) {
     dispatchCallbacks(this.editor, this.callbacks);
     clipboardPaste(this.editor);
 
-    Shortcut("Tab", (event) => {});
+    Shortcut("Tab", (event) => {
+        document.execCommand("insertHTML", false, "&#009");
+    });
 
     Shortcut("ctrl+b", (event) => {
         const textState = getTextState(this.editor);
