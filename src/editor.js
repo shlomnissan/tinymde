@@ -24,15 +24,7 @@ const Editor = function (root) {
 
     dispatchCallbacks(this.editor, this.callbacks);
     clipboardPaste(this.editor);
-
-    Shortcut("Tab", (event) => {
-        document.execCommand("insertHTML", false, "&#009");
-    });
-
-    Shortcut("ctrl+b", (event) => {
-        const textState = getTextState(this.editor);
-        Bold.execute(this.editor, textState);
-    });
+    addShortcuts.apply(this);
 
     Object.defineProperty(this, "content", {
         get: function () {
@@ -108,6 +100,26 @@ function dispatchCallbacks(editor, callbacks) {
             callbacks.onkeyup(event);
         }
     };
+}
+
+/**
+ * Add keyboard shortcut combinations and trigger MD commands.
+ * This function is called using .apply() to set this as the editor object.
+ */
+function addShortcuts() {
+    Shortcut("Tab", () => {
+        document.execCommand("insertHTML", false, "&#009");
+    });
+
+    Shortcut("ctrl+b", () => this.executeCommand("bold"));
+    Shortcut("ctrl+i", () => this.executeCommand("italic"));
+    Shortcut("ctrl+k", () => this.executeCommand("link"));
+    Shortcut("ctrl+1", () => this.executeCommand("header", 1));
+    Shortcut("ctrl+2", () => this.executeCommand("header", 2));
+    Shortcut("ctrl+3", () => this.executeCommand("header", 3));
+    Shortcut("ctrl+4", () => this.executeCommand("header", 4));
+    Shortcut("ctrl+5", () => this.executeCommand("header", 5));
+    Shortcut("ctrl+6", () => this.executeCommand("header", 6));
 }
 
 /**
