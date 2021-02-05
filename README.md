@@ -1,4 +1,4 @@
-## TinyMDE
+# TinyMDE
 TinyMDE is a simple markdown editor with a tiny footprint. It has minimal dependencies and a collection of powerful features designed to improve the writing experience on the web.
 
 ## Features:
