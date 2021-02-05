@@ -1,5 +1,6 @@
 import Editor from "./editor";
 import Toolbar from "./toolbar";
+import Shortcut from "./shortcut";
 import { wordCount } from "./utils/string";
 
 import "./style/theme.less";
@@ -26,7 +27,9 @@ const TinyMDE = function (editorSelector) {
     this.editor = new Editor(root);
 
     if (this.config.showToolbar) {
-        this.toolbar = new Toolbar(root, this.handleCommand.bind(this));
+        this.toolbar = new Toolbar(root, (command, value = null) => {
+            this.editor.executeCommand(command, value);
+        });
 
         if (this.config.toggleUI) {
             this.editor.addEventListener("onkeypress", () => {
@@ -58,12 +61,12 @@ TinyMDE.prototype.setContent = function (content) {
 };
 
 /**
- * Executes command through the Editor object.
- * @param {string} command
- * @param {any} value - optional value.
+ * Registers a new shortcut for extended functionality.
+ * @param {string} keys
+ * @param {Function} callback
  */
-TinyMDE.prototype.handleCommand = function (command, value = null) {
-    this.editor.executeCommand(command, value);
+TinyMDE.prototype.registerShortcut = function (keys, callback) {
+    Shortcut(keys, callback);
 };
 
 export default TinyMDE;

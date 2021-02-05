@@ -1,6 +1,6 @@
 import { getTextState } from "./utils/edit";
 
-import Shortcut from "./shortcuts";
+import Shortcut from "./shortcut";
 import Bold from "./commands/bold";
 import Italic from "./commands/italic";
 import Strikethrough from "./commands/strikethrough";
