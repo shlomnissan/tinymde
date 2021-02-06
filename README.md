@@ -25,7 +25,12 @@ TBC.
 
 ### setContent(content: string)
 
-TBC.
+This function overrides the text in the editor. It's often used when the editor first initializes. For example:
+```
+const tinymde = new TinyMDE("#editor", config);
+tinymde.setContent("**Hello World!**);
+```
+Note that any HTML tags will be escaped and rendered as plain text.
 
 - - -
 
