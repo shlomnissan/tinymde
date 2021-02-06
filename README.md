@@ -29,7 +29,7 @@ TBC.
 
 - - -
 
-### registerShortcut(keys: string, callback: Function)
+### registerShortcut(keys: string, callback: function)
 
 This function lets you register custom keyboard shortcuts. It accepts key combinations separated by a comma and a callback.
 
