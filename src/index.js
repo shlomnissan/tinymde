@@ -8,7 +8,7 @@ import "./style/theme.less";
 const config = {
     showToolbar: true,
     showWordCount: false,
-    toggleUI: false,
+    toggleToolbar: false,
 };
 
 /**
@@ -31,7 +31,7 @@ const TinyMDE = function (editorSelector) {
             this.editor.executeCommand(command, value);
         });
 
-        if (this.config.toggleUI) {
+        if (this.config.toggleToolbar) {
             this.editor.addEventListener("onkeypress", () => {
                 this.toolbar.hideToolbar();
             });
