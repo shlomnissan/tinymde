@@ -19,6 +19,12 @@ TBC.
 
 ## Configuration:
 
+| Param | Description | Default |
+|:----------|:-------------|:------|
+| `showToolbar` | Shows the default toolbar. | `true` |
+| `showWordCount` | Shows the word count (default toolbar required). | `true` |
+| `toggleToolbar` | Hides the toolbar when the user starts typing (reappears when the mouse moves). | `false` |
+
 The configuration object should be passed to the constructor function:
 
 ```js
@@ -26,12 +32,6 @@ const tinymde = new TinyMDE({
     showToolbar: false
 });
 ```
-
-| Param | Description | Default |
-|:----------|:-------------|:------|
-| `showToolbar` | Shows the default toolbar. | `true` |
-| `showWordCount` | Shows the word count (default toolbar required). | `true` |
-| `toggleToolbar` | Hides the toolbar when the user starts typing (reappears when the mouse moves). | `false` |
 
 ## API:
 
