@@ -23,7 +23,7 @@ TBC.
 
 ## API:
 
-#### setContent(content: string)
+### setContent(content: string)
 
 TBC.
 
