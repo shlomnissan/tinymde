@@ -1,6 +1,6 @@
 import { getTextState } from "./utils/edit";
 
-import Shortcut from "./shortcut";
+import Shortcut, { initializeShortcuts } from "./shortcut";
 import Bold from "./commands/bold";
 import Italic from "./commands/italic";
 import Strikethrough from "./commands/strikethrough";
@@ -21,6 +21,7 @@ const Editor = function (root) {
     this.callbacks = {};
 
     root.append(this.editor);
+    initializeShortcuts(this.editor);
 
     dispatchCallbacks(this.editor, this.callbacks);
     clipboardPaste(this.editor);

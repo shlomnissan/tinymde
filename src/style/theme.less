@@ -8,6 +8,7 @@
 @4px: 4px;
 @8px: 8px;
 @16px: 16px;
+@24px: 24px;
 
 @font-face {
     font-family: "editor-regular";
@@ -185,14 +186,13 @@
         flex: 1;
         height: 100%;
         font-family: "editor-regular";
-        font-size: 16px;
-        padding: @16px;
+        font-size: @16px;
         outline: 0px;
         -webkit-font-smoothing: never;
         overflow-y: scroll;
         white-space: pre-wrap;
         caret-color: @color-highlight;
-        padding: 48px;
+        padding: @24px;
 
         &::-webkit-scrollbar {
             width: 4px;

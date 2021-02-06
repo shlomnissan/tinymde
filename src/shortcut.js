@@ -28,15 +28,17 @@ const modifiers = [
 /**
  * Add keyboard event listeners if needed.
  */
-function initialize() {
+export function initializeShortcuts(container) {
     if (!didInitialize) {
         didInitialize = true;
-        window.addEventListener("keydown", (event) => {
+        container.addEventListener("keydown", (event) => {
             handleKeyDown(event);
         });
-        window.addEventListener("keyup", (event) => {
+        container.addEventListener("keyup", (event) => {
             handleKeyUp(event);
         });
+    } else {
+        console.error("TinyMDE shortcuts are already initialized.");
     }
 }
 
@@ -95,22 +97,28 @@ function testKeyCombination(event, candidates) {
 }
 
 /**
- * Split key combinations string, use '+' as dilimiter.
- * This function DOESN'T trim spaces or validates formatting.
+ * Split key combinations string. Each string can have
+ * multiple key combinations separated by a comma.
  * @param  {string} str
  */
-function getKeys(str) {
-    const keys = str.split("+");
-    const output = {
-        keys: [],
-        modifiers: [],
-    };
-    keys.forEach((key) => {
-        if (Object.keys(modifiersMap).includes(key)) {
-            output.modifiers.push(modifiersMap[key]);
-        } else {
-            output.keys.push(key);
-        }
+function getKeyCombinations(str) {
+    str = str.replace(/\s/g, "");
+    const output = [];
+    str.split(",").forEach((combo_str) => {
+        const keys = combo_str.split("+");
+        const keyCombo = {
+            keys: [],
+            modifiers: [],
+            label: combo_str,
+        };
+        keys.forEach((key) => {
+            if (Object.keys(modifiersMap).includes(key)) {
+                keyCombo.modifiers.push(modifiersMap[key]);
+            } else {
+                keyCombo.keys.push(key);
+            }
+        });
+        output.push(keyCombo);
     });
     return output;
 }
@@ -121,20 +129,23 @@ function getKeys(str) {
  * @param  {function} callback
  */
 function Shortcut(keys, callback) {
-    initialize();
-
-    const register = getKeys(keys);
-    register.callback = [];
-
-    register.keys.forEach((key) => {
-        if (!keyWatch[key]) keyWatch[key] = [];
-        keyWatch[key].push(keys);
-    });
-
-    if (!callbacks[keys]) {
-        callbacks[keys] = register;
+    if (!didInitialize) {
+        console.error("TinyMDE shortcuts aren't initialized.");
+        return;
     }
-    callbacks[keys]["callback"].push(callback);
+    const keyCombinations = getKeyCombinations(keys);
+    keyCombinations.forEach((register) => {
+        const { label } = register;
+        register.callback = [];
+        register.keys.forEach((key) => {
+            if (!keyWatch[key]) keyWatch[key] = [];
+            keyWatch[key].push(label);
+        });
+        if (!callbacks[label]) {
+            callbacks[label] = register;
+        }
+        callbacks[label]["callback"].push(callback);
+    });
 }
 
 export default Shortcut;
