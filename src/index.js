@@ -5,7 +5,7 @@ import { wordCount } from "./utils/string";
 
 import "./style/theme.less";
 
-const config = {
+const __config = {
     showToolbar: true,
     showWordCount: false,
     toggleToolbar: false,
@@ -16,14 +16,17 @@ const config = {
  * @constructor
  * @param {string} editorSelector - The class name or id of the root container.
  */
-const TinyMDE = function (editorSelector) {
+const TinyMDE = function (editorSelector, config = {}) {
     const root = document.querySelector(editorSelector);
     if (!root) {
-        console.error(`'${editorSelector}' isn't a valid selector.`);
+        console.error(`TinyMDE: '${editorSelector}' isn't a valid selector.`);
         return;
     }
     root.id = "tinymde-root";
-    this.config = config;
+
+    config = validateConfig(config);
+    this.config = { ...__config, ...config };
+
     this.editor = new Editor(root);
 
     if (this.config.showToolbar) {
@@ -75,5 +78,18 @@ TinyMDE.prototype.getContent = function () {
 TinyMDE.prototype.registerShortcut = function (keys, callback) {
     Shortcut(keys, callback);
 };
+
+function validateConfig(config) {
+    const validParam = Object.keys(__config);
+    Object.keys(config).forEach((param) => {
+        if (!validParam.includes(param)) {
+            console.error(
+                `TinyMDE: ${param} isn't a valid configuration parameter.`
+            );
+            delete config[param];
+        }
+    });
+    return config;
+}
 
 export default TinyMDE;

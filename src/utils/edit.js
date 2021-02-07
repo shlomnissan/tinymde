@@ -4,7 +4,7 @@
  */
 export function getRange() {
     if (!document.getSelection) {
-        console.error("documnt.getSelection() isn't supported.");
+        console.error("TinyMDE: documnt.getSelection() isn't supported.");
         return;
     }
     const selection = document.getSelection();

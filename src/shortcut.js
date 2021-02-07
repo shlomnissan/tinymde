@@ -38,7 +38,7 @@ export function initializeShortcuts(container) {
             handleKeyUp(event);
         });
     } else {
-        console.error("TinyMDE shortcuts are already initialized.");
+        console.error("TinyMDE: shortcuts are already initialized.");
     }
 }
 
@@ -130,7 +130,7 @@ function getKeyCombinations(str) {
  */
 function Shortcut(keys, callback) {
     if (!didInitialize) {
-        console.error("TinyMDE shortcuts aren't initialized.");
+        console.error("TinyMDE: shortcuts aren't initialized.");
         return;
     }
     const keyCombinations = getKeyCombinations(keys);
