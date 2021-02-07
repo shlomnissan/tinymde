@@ -39,11 +39,19 @@ const tinymde = new TinyMDE({
 
 This function overrides the text in the editor. It's often used when the editor first initializes. For example:
 ```js
-const tinymde = new TinyMDE("#editor", config);
 tinymde.setContent("**Hello World!**);
 ```
 Note that any HTML tags will be escaped and rendered as plain text.
 
+- - -
+
+### getContent()
+
+This function retrieves the content from the editor as plain text.
+```js
+tinymde.setContent("**TinyMDE**");
+tinymde.getContent(); // returns **TinyMDE** 
+```
 - - -
 
 ### registerShortcut(keys: string, callback: function)
@@ -53,7 +61,8 @@ This function lets you register custom keyboard shortcuts. It accepts key combin
 A common use-case for a custom shortcut is saving the text. Suppose you want to trigger a save function when the user presses `ctrl + s` or `ctrl + w`. This is how you would call the function:
 ```js
 tinymde.registerShortcut("ctrl+s, ctrl+w", () => {
-    // save text logic
+    const content = tinymde.getContent();
+    // save the content
 });
 ```
 Note that the keyboard event is not registered on the window object but the editor's object itself. If the editor is not active, the callback will not execute.

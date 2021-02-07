@@ -50,7 +50,7 @@ const TinyMDE = function (editorSelector) {
 };
 
 /**
- * Inserts/replaces content throught the Editor object.
+ * Inserts/replaces content.
  * @param {string} content - the new content.
  */
 TinyMDE.prototype.setContent = function (content) {
@@ -58,6 +58,13 @@ TinyMDE.prototype.setContent = function (content) {
     if (this.config.showToolbar && this.config.showWordCount) {
         this.toolbar.setWordCount(wordCount(content));
     }
+};
+
+/**
+ * Returns the content as plain text.
+ */
+TinyMDE.prototype.getContent = function () {
+    return this.editor.content;
 };
 
 /**
