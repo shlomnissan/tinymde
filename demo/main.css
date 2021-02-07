@@ -38,6 +38,17 @@ html, body {
     display: none;
 }
 
+#footer {
+    font-family: "editor-regular";
+    font-size: 11px;
+    margin-top: 32px;
+    color: #AAA;
+}
+
+#footer a {
+    color: black;
+}
+
 @media only screen and (max-width: 800px) {
     .show-small {
         display: block;
