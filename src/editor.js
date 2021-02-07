@@ -1,4 +1,4 @@
-import { getTextState } from "./utils/edit";
+import { getTextState, setSelection } from "./utils/edit";
 
 import Shortcut, { initializeShortcuts } from "./shortcut";
 import Bold from "./commands/bold";
@@ -33,13 +33,18 @@ const Editor = function (root) {
         },
         set: function (val) {
             this.editor.innerText = val;
+            setTimeout(() => {
+                setSelection({
+                    start: this.editor.innerText.length,
+                    end: this.editor.innerText.length,
+                });
+            });
         },
         configurable: false,
         enumerable: false,
     });
 
     this.editor.focus();
-    // TODO: move caret to the end
 };
 /**
  * Propogate event listeners.
