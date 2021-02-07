@@ -5,6 +5,7 @@ import Bold from "./commands/bold";
 import Italic from "./commands/italic";
 import Strikethrough from "./commands/strikethrough";
 import Header from "./commands/header";
+import UnorderedList from "./commands/unordered_list";
 import Blockquote from "./commands/blockquote";
 import Link from "./commands/link";
 
@@ -76,11 +77,20 @@ Editor.prototype.executeCommand = function (command, value) {
         case "header":
             Header.execute(this.editor, textState, value);
             break;
+        case "unordered-list":
+            UnorderedList.execute(this.editor, textState, "unordered");
+            break;
+        case "ordered-list":
+            // TODO: implement
+            break;
         case "blockquote":
             Blockquote.execute(this.editor, textState);
             break;
         case "link":
             Link.execute(this.editor, textState);
+            break;
+        default:
+            console.error(`TinyMDE: ${command} is an invalid command.`);
             break;
     }
 };
@@ -113,19 +123,50 @@ function dispatchCallbacks(editor, callbacks) {
  * This function is called using .apply() to set this as the editor object.
  */
 function addShortcuts() {
-    Shortcut("Tab", () => {
+    Shortcut("Tab", (event) => {
+        event.preventDefault();
         document.execCommand("insertHTML", false, "&#009");
     });
-
-    Shortcut("ctrl+b", () => this.executeCommand("bold"));
-    Shortcut("ctrl+i", () => this.executeCommand("italic"));
-    Shortcut("ctrl+k", () => this.executeCommand("link"));
-    Shortcut("ctrl+1", () => this.executeCommand("header", 1));
-    Shortcut("ctrl+2", () => this.executeCommand("header", 2));
-    Shortcut("ctrl+3", () => this.executeCommand("header", 3));
-    Shortcut("ctrl+4", () => this.executeCommand("header", 4));
-    Shortcut("ctrl+5", () => this.executeCommand("header", 5));
-    Shortcut("ctrl+6", () => this.executeCommand("header", 6));
+    Shortcut("ctrl+b", (event) => {
+        event.preventDefault();
+        this.executeCommand("bold");
+    });
+    Shortcut("ctrl+i", (event) => {
+        event.preventDefault();
+        this.executeCommand("italic");
+    });
+    Shortcut("ctrl+k", (event) => {
+        event.preventDefault();
+        this.executeCommand("link");
+    });
+    Shortcut("ctrl+1", (event) => {
+        event.preventDefault();
+        this.executeCommand("header", 1);
+    });
+    Shortcut("ctrl+2", (event) => {
+        event.preventDefault();
+        this.executeCommand("header", 2);
+    });
+    Shortcut("ctrl+3", (event) => {
+        event.preventDefault();
+        this.executeCommand("header", 3);
+    });
+    Shortcut("ctrl+4", (event) => {
+        event.preventDefault();
+        this.executeCommand("header", 4);
+    });
+    Shortcut("ctrl+5", (event) => {
+        event.preventDefault();
+        this.executeCommand("header", 5);
+    });
+    Shortcut("ctrl+6", (event) => {
+        event.preventDefault();
+        this.executeCommand("header", 6);
+    });
+    Shortcut("ctrl+l", (event) => {
+        event.preventDefault();
+        this.executeCommand("unordered-list");
+    });
 }
 
 /**

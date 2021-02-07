@@ -8,6 +8,8 @@ const keyWatch = {};
 
 const callbacks = {};
 
+const deferred = [];
+
 const modifiersMap = {
     shift: 16,
     alt: 18,
@@ -36,6 +38,10 @@ export function initializeShortcuts(container) {
         });
         container.addEventListener("keyup", (event) => {
             handleKeyUp(event);
+        });
+        deferred.forEach((shortcut) => {
+            Shortcut(shortcut.keys, shortcut.callback);
+            delete deferred[shortcut];
         });
     } else {
         console.error("TinyMDE: shortcuts are already initialized.");
@@ -91,7 +97,6 @@ function testKeyCombination(event, candidates) {
             }
         });
         if (!shouldDispatch) return;
-        event.preventDefault();
         callbacks[candidate].callback.forEach((c) => c(event));
     });
 }
@@ -128,9 +133,13 @@ function getKeyCombinations(str) {
  * @param  {string} keys
  * @param  {function} callback
  */
-function Shortcut(keys, callback) {
+function Shortcut(keys, callback, defer) {
     if (!didInitialize) {
-        console.error("TinyMDE: shortcuts aren't initialized.");
+        if (!defer) {
+            console.error("TinyMDE: shortcuts aren't initialized.");
+        } else {
+            deferred.push({ keys, callback });
+        }
         return;
     }
     const keyCombinations = getKeyCombinations(keys);

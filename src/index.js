@@ -30,9 +30,7 @@ const TinyMDE = function (editorSelector, config = {}) {
     this.editor = new Editor(root);
 
     if (this.config.showToolbar) {
-        this.toolbar = new Toolbar(root, (command, value = null) => {
-            this.editor.executeCommand(command, value);
-        });
+        this.toolbar = new Toolbar(root, this.executeCommand.bind(this));
 
         if (this.config.toggleToolbar) {
             this.editor.addEventListener("onkeypress", () => {
@@ -68,6 +66,15 @@ TinyMDE.prototype.setContent = function (content) {
  */
 TinyMDE.prototype.getContent = function () {
     return this.editor.content;
+};
+
+/**
+ * Executes a command.
+ * @param {string} command
+ * @param {any} value - optional value.
+ */
+TinyMDE.prototype.executeCommand = function (command, value = "") {
+    this.editor.executeCommand(command, value);
 };
 
 /**

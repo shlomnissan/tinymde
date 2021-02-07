@@ -14,6 +14,8 @@ const commands = [
                 optionsType: "grid",
             },
         },
+        "unordered-list",
+        "ordered-list",
         "blockquote",
     ],
     ["link"],

@@ -7,7 +7,7 @@ TinyMDE is a simple markdown editor with a tiny footprint. It has minimal depend
 * Markdown toggle.
 * Keyboard shortcuts.
 * Full-screen mode.
-* Inline image uploads.
+* Inline image uploads (drag/drop)
 * Tabs to space.
 * New list items.
 * Extensible.
@@ -39,7 +39,7 @@ const tinymde = new TinyMDE({
 
 This function overrides the text in the editor. It's often used when the editor first initializes. For example:
 ```js
-tinymde.setContent("**Hello World!**);
+tinymde.setContent("**Hello World!**");
 ```
 Note that any HTML tags will be escaped and rendered as plain text.
 
@@ -52,17 +52,43 @@ This function retrieves the content from the editor as plain text.
 tinymde.setContent("**TinyMDE**");
 tinymde.getContent(); // returns **TinyMDE** 
 ```
+
+- - -
+
+### executeCommand(command: string, value: string | number | optional)
+
+This function executes a command. It's often used for implementing a custom UI.
+
+```js
+tinymde.executeCommand("header", 2); // makes current selection heading 2
+```
+
+Supported commands:
+- `bold`
+- `italic`
+- `strikethrough`
+- `header`
+- `unordered-list`
+- `ordered-list`
+- `blockquote`
+- `link`
+- `image`
 - - -
 
 ### registerShortcut(keys: string, callback: function)
 
 This function lets you register custom keyboard shortcuts. It accepts key combinations separated by a comma and a callback.
 
-A common use-case for a custom shortcut is saving the text. Suppose you want to trigger a save function when the user presses `ctrl + s` or `ctrl + w`. This is how you would call the function:
+A common use-case for a custom shortcut is saving the text. Suppose you want to trigger a save function when the user presses `ctrl + s` or `ctrl + w`:
 ```js
-tinymde.registerShortcut("ctrl+s, ctrl+w", () => {
+tinymde.registerShortcut("ctrl+s, ctrl+w", (event) => {
+    event.preventDefault();
     const content = tinymde.getContent();
     // save the content
 });
 ```
-Note that the keyboard event is not registered on the window object but the editor's object itself. If the editor is not active, the callback will not execute.
+Supported modifiers:
+- `shift`
+- `alt`, `option`
+- `ctrl`, `control`
+- `cmd`, `command`
