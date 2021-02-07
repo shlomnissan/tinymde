@@ -64,8 +64,16 @@ export function getTextState(editor) {
 export function setSelection({ start, end }) {
     const range = getRange();
     if (!range) return;
-    range.setStart(range.startContainer, start);
-    range.setEnd(range.endContainer, end);
+
+    let container = range.startContainer;
+    if (container.nodeType !== Node.TEXT_NODE) {
+        container = range.startContainer.childNodes.length
+            ? range.startContainer.childNodes[0]
+            : null;
+    }
+    if (container === null) return;
+    range.setStart(container, start);
+    range.setEnd(container, end);
     return range.cloneContents().textContent;
 }
 
