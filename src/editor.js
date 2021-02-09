@@ -8,6 +8,8 @@ import Header from "./commands/header";
 import UnorderedList from "./commands/unordered_list";
 import Blockquote from "./commands/blockquote";
 import Link from "./commands/link";
+import Cursor from "./utils/cursor";
+import { tokenize } from "./utils/syntax";
 
 /**
  * Editor object.
@@ -33,20 +35,43 @@ const Editor = function (root) {
             return this.editor.innerText;
         },
         set: function (val) {
-            this.editor.innerText = val;
+            this.editor.innerHTML = tokenize(val);
             setTimeout(() => {
-                setSelection({
-                    start: this.editor.innerText.length,
-                    end: this.editor.innerText.length,
-                });
+                Cursor.setCurrentCursorPosition(
+                    this.editor.innerText.length,
+                    this.editor
+                );
             });
         },
         configurable: false,
         enumerable: false,
     });
 
+    this.editor.addEventListener("keydown", (event) => {
+        if (event.key.length !== 1) return;
+        setTimeout(() => {
+            const container = getParentElement();
+            if (container) {
+                if (container.innerText.length === 0) return;
+                const offset = Cursor.getCurrentCursorPosition(container);
+                container.innerHTML = tokenize(container.innerText);
+                Cursor.setCurrentCursorPosition(offset, container);
+            }
+        });
+    });
+
     this.editor.focus();
 };
+
+function getParentElement() {
+    let container = window.getSelection().anchorNode.parentElement;
+    while (!container.classList.contains("tinymde-paragraph")) {
+        if (container.parentElement === null) return;
+        container = container.parentElement;
+    }
+    return container;
+}
+
 /**
  * Propogate event listeners.
  * Currently supporting onkeypress, onmousemove, onkeyup.

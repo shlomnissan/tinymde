@@ -9,6 +9,7 @@
 @8px: 8px;
 @16px: 16px;
 @24px: 24px;
+@32px: 32px;
 
 @font-face {
     font-family: "editor-regular";
@@ -193,16 +194,18 @@
     }
 
     #tinymde-editor {
+        @font-size: @16px;
         flex: 1;
         height: 100%;
         font-family: "editor-regular";
-        font-size: @16px;
+        font-size: @font-size;
         outline: 0px;
         -webkit-font-smoothing: never;
         overflow-y: scroll;
         white-space: pre-wrap;
         caret-color: @color-highlight;
-        padding: @24px;
+        padding: @32px;
+        line-height: (@font-size - 2px) * 2;
 
         &::-webkit-scrollbar {
             width: 4px;

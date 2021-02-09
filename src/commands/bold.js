@@ -1,41 +1,34 @@
-import { getSurroundingWord, setSelection } from "../utils/edit";
+import { getSurroundingWord, selectElement, setSelection } from "../utils/edit";
 import insertText from "../utils/text";
 
-const Bold = function () {};
+const Bold = {
+    regex: /(\*{2})(.*?)(\1)/g,
+    execute: function (editor, state) {
+        const wordOffset = getSurroundingWord(state.text, state.position);
+        const mdOffset = 2;
+        let text = "";
 
-/**
- * Toggle bold markdown to current word and select it.
- * @param {HTMLDivElement} editor - contentEditable div tag.
- * @param {Object} textState - { text: string, position: number }
- */
-Bold.prototype.execute = function (editor, state) {
-    const regex = /(\*{2})(.*?)(\1)/g;
-    const wordOffset = getSurroundingWord(state.text, state.position);
-    const mdOffset = 2;
-
-    let text = "";
-    let selection = { start: 0, end: 0 };
-
-    const addMarkdown = () => {
-        text = `**${word}**`;
-        selection = {
-            start: wordOffset.start + mdOffset,
-            end: wordOffset.end + mdOffset,
+        const addMarkdown = () => {
+            text = `**${word}**`;
+            insertText(editor, text);
+            setTimeout(() => {
+                const node = window.getSelection().baseNode?.parentNode;
+                if (node) selectElement(node, mdOffset);
+            }, 5);
         };
-    };
 
-    const stripMarkdown = () => {
-        text = word.replace(regex, "$2");
-        selection = {
-            start: state.position - mdOffset,
-            end: state.position - mdOffset,
+        const stripMarkdown = () => {
+            text = word.replace(this.regex, "$2");
+            insertText(editor, text);
+            setSelection({
+                start: state.position - mdOffset,
+                end: state.position - mdOffset,
+            });
         };
-    };
 
-    const word = setSelection(wordOffset);
-    word.match(regex) ? stripMarkdown() : addMarkdown();
-    insertText(editor, text);
-    setSelection(selection);
+        const word = setSelection(wordOffset);
+        word.match(this.regex) ? stripMarkdown() : addMarkdown();
+    },
 };
 
-export default new Bold();
+export default Bold;

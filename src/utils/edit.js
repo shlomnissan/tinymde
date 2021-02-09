@@ -57,6 +57,15 @@ export function getTextState(editor) {
     };
 }
 
+export function selectElement(element, offset) {
+    const sel = window.getSelection();
+    const range = new Range();
+    range.setStart(element.firstChild, offset);
+    range.setEnd(element.firstChild, element.innerText.length - offset);
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
 /**
  * Make a dynamic text selection in the currently selected range.
  * @param {Object} - { start: number, end: number }.
