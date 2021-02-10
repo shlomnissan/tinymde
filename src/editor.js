@@ -48,7 +48,7 @@ const Editor = function (root) {
     });
 
     this.editor.addEventListener("keydown", (event) => {
-        if (event.key.length !== 1) return;
+        if (event.key.length !== 1 && event.key !== "Backspace") return;
         setTimeout(() => {
             const container = getParentElement();
             if (container) {
