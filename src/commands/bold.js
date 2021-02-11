@@ -6,14 +6,6 @@ import {
 } from "../utils/edit";
 import insertText from "../utils/text";
 
-// Current issues:
-// ----------------------------------------
-// 1. [x] don't show markdown if text is empty
-// 2. [x] toggle throws and error when the caret is in between **
-// 3. [x] toggle throws and error when the care is in between ** beginning
-// 4. [x] setSelection does too many things (set cursor, select content, return selected content)
-// 5. [x] Toggle doesn't support empty ****
-
 const Bold = {
     regex: /\*\*(.*?).\*\*/gm,
 
@@ -27,10 +19,10 @@ const Bold = {
 
         if (!node || !sel) return;
 
-        const toggle = state.text.match(this.regex);
+        const isMarkdown = state.text.match(this.regex);
 
-        if (toggle) {
-            const word = toggle[0];
+        if (isMarkdown) {
+            const word = isMarkdown[0];
             selectContents(node, 0);
             insertText(
                 editor,
@@ -39,40 +31,37 @@ const Bold = {
 
             setCursorInActiveRange(state.position - this.offset);
         } else {
-            // get the current selection
+            // Get the current selection
             let selectionRange = {
                 start: Math.min(sel.anchorOffset, sel.focusOffset),
                 end: Math.max(sel.anchorOffset, sel.focusOffset),
             };
 
-            // if there is selection, get surrounding word
+            // If there is selection, get the surrounding word and select it
+            let selection = "";
             if (sel.isCollapsed) {
                 selectionRange = getSurroundingWord(state.text, state.position);
+                selection = getContentsInActiveRange(selectionRange);
             }
 
-            // select the range and return the selection content
-            const selection = getContentsInActiveRange(selectionRange);
-
-            // invalid mardown
+            // Clean invalid markdown
             if (selection === "****" || selection === "**") {
                 insertText(editor, "");
                 return;
             }
 
-            // insert selected content in-place of selection
+            // Insert selected content in-place
             insertText(editor, `**${selection}**`);
 
-            // if a word wasn't selected, set the position
+            // If a word wasn't selected, set the position
             if (!selection) {
                 setCursorInActiveRange(state.position + this.offset);
-                return;
+            } else {
+                // If a word was selected, set the position after syntax highlighting
+                setTimeout(() => {
+                    setCursorInActiveRange(selection.length + this.offset);
+                }, 10);
             }
-
-            // if a word was selected, insert and select the word
-            setTimeout(() => {
-                const __node__ = this.getNode();
-                if (__node__) selectContents(__node__, this.offset);
-            }, 10);
         }
     },
 };

@@ -1,5 +1,5 @@
 /**
- * Returns the range of the current selection. This function assumes that a selection is set.
+ * Returns the currently active range.
  * @return {Range}
  */
 export function getActiveRange() {
