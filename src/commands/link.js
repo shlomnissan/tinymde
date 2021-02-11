@@ -1,4 +1,8 @@
-import { getSurroundingWord, setSelection, getRange } from "../utils/edit";
+import {
+    getSurroundingWord,
+    setSelection,
+    getActiveRange,
+} from "../utils/edit";
 import insertText from "../utils/text";
 
 const Link = function () {};

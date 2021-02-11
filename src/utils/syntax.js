@@ -13,7 +13,7 @@ export function tokenize(str) {
 }
 
 function transformBold(paragraph) {
-    const bold_md = paragraph.match(/(\*{2})(.*?)(\1)/g);
+    const bold_md = paragraph.match(/\*\*(.*?).\*\*/gm);
     if (bold_md) {
         bold_md.forEach((bold) => {
             paragraph = paragraph.split(bold).join(`<strong>${bold}</strong>`);

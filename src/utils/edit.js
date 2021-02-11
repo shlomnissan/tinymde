@@ -2,7 +2,7 @@
  * Returns the range of the current selection. This function assumes that a selection is set.
  * @return {Range}
  */
-export function getRange() {
+export function getActiveRange() {
     if (!document.getSelection) {
         console.error("TinyMDE: documnt.getSelection() isn't supported.");
         return;
@@ -48,13 +48,49 @@ export function getSurroundingWord(text, position) {
  */
 export function getTextState(editor) {
     editor.focus();
-    const range = getRange();
+    const range = getActiveRange();
     if (!range) return;
     const wholeText = range.startContainer?.wholeText || "";
     return {
         text: wholeText,
         position: range.startOffset,
     };
+}
+
+function getContainerFromActiveRange() {
+    const range = getActiveRange();
+    if (!range) return null;
+
+    let container = range.startContainer;
+    if (!container) return;
+
+    return container.nodeType === Node.TEXT_NODE
+        ? container
+        : range.startContainer.firstChild;
+}
+
+export function setCursorInActiveRange(offset) {
+    const container = getContainerFromActiveRange();
+    if (!container) return;
+
+    const range = getActiveRange();
+
+    if (offset < 0 || offset > container.length) return;
+
+    range.setStart(container, offset);
+    range.setEnd(container, offset);
+}
+
+export function getContentsInActiveRange({ start, end }) {
+    const container = getContainerFromActiveRange();
+    if (!container) return;
+
+    const range = getActiveRange();
+
+    range.setStart(container, start);
+    range.setEnd(container, end);
+
+    return range.cloneContents().textContent;
 }
 
 export function selectContents(element, offset) {
@@ -68,11 +104,9 @@ export function selectContents(element, offset) {
 
 /**
  * @deprecated
- * Make a dynamic text selection in the currently selected range.
- * @param {Object} - { start: number, end: number }.
  */
 export function setSelection({ start, end }) {
-    const range = getRange();
+    const range = getActiveRange();
     if (!range) return;
 
     let container = range.startContainer;
