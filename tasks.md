@@ -9,9 +9,9 @@
 - [ ] Add namespaces to utilities
 - [x] Header sytnax highlighting
 - [ ] Remove setSelection
-- [ ] Refactor Cursor
+- [x] Convert cursor to an object literal
 - [ ] Fix command + Z
-- [ ] Refactor commands:
+- [ ] Commands:
     - [x] Bold
     - [x] Header
     - [ ] Italic
@@ -19,3 +19,5 @@
     - [ ] Blockqoute
     - [ ] Link
     - [ ] Unordered list
+    - [ ] Ordered list
+    - [ ] Image upload
