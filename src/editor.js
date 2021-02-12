@@ -49,22 +49,22 @@ const Editor = function (root) {
 
     this.editor.addEventListener("keydown", (event) => {
         if (event.key.length !== 1 && event.key !== "Backspace") return;
-
-        setTimeout(() => {
-            const container = getParagraph();
-            if (container) {
-                if (container.innerText.length === 0) return;
-                const offset = Cursor.getCurrentCursorPosition(container);
-                container.innerHTML = Syntax.tokenize(
-                    container.innerText,
-                    true
-                );
-                Cursor.setCurrentCursorPosition(offset, container);
-            }
-        });
+        this.runSyntaxHighlighter();
     });
 
     this.editor.focus();
+};
+
+Editor.prototype.runSyntaxHighlighter = function () {
+    setTimeout(() => {
+        const container = getParagraph();
+        if (container) {
+            if (container.innerText.length === 0) return;
+            const offset = Cursor.getCurrentCursorPosition(container);
+            container.innerHTML = Syntax.tokenize(container.innerText, true);
+            Cursor.setCurrentCursorPosition(offset, container);
+        }
+    });
 };
 
 /**

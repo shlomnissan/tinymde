@@ -2,14 +2,14 @@
 
 - [x] Word commands: don't select the entire word
 - [ ] Add jsdoc to new undocumented functions
-- [ ] Syntax highlighting on toolbar action
+- [x] Run Syntax highlighting on toolbar action
 - [ ] Fix empty new line bug (repro: 2 new lines, and type text)
 - [ ] Indent headers
 - [ ] Convert Editor and Toolbar to object literals
 - [ ] Add namespaces to utilities
 - [x] Header sytnax highlighting
 - [ ] Remove setSelection
-- [ ] Remove Cursor
+- [ ] Refactor Cursor
 - [ ] Fix command + Z
 - [ ] Refactor commands:
     - [x] Bold
