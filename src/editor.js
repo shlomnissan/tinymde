@@ -1,4 +1,4 @@
-import { getTextState, setSelection } from "./utils/edit";
+import { getTextState, getParagraph } from "./utils/edit";
 
 import Shortcut, { initializeShortcuts } from "./shortcut";
 import Bold from "./commands/bold";
@@ -9,7 +9,7 @@ import UnorderedList from "./commands/unordered_list";
 import Blockquote from "./commands/blockquote";
 import Link from "./commands/link";
 import Cursor from "./utils/cursor";
-import { tokenize } from "./utils/syntax";
+import Syntax from "./utils/syntax";
 
 /**
  * Editor object.
@@ -35,7 +35,7 @@ const Editor = function (root) {
             return this.editor.innerText;
         },
         set: function (val) {
-            this.editor.innerHTML = tokenize(val);
+            this.editor.innerHTML = Syntax.tokenize(val);
             setTimeout(() => {
                 Cursor.setCurrentCursorPosition(
                     this.editor.innerText.length,
@@ -49,12 +49,16 @@ const Editor = function (root) {
 
     this.editor.addEventListener("keydown", (event) => {
         if (event.key.length !== 1 && event.key !== "Backspace") return;
+
         setTimeout(() => {
-            const container = getParentElement();
+            const container = getParagraph();
             if (container) {
                 if (container.innerText.length === 0) return;
                 const offset = Cursor.getCurrentCursorPosition(container);
-                container.innerHTML = tokenize(container.innerText);
+                container.innerHTML = Syntax.tokenize(
+                    container.innerText,
+                    true
+                );
                 Cursor.setCurrentCursorPosition(offset, container);
             }
         });
@@ -62,15 +66,6 @@ const Editor = function (root) {
 
     this.editor.focus();
 };
-
-function getParentElement() {
-    let container = window.getSelection().anchorNode.parentElement;
-    while (!container.classList.contains("tinymde-paragraph")) {
-        if (container.parentElement === null) return;
-        container = container.parentElement;
-    }
-    return container;
-}
 
 /**
  * Propogate event listeners.
@@ -91,7 +86,7 @@ Editor.prototype.executeCommand = function (command, value) {
     const textState = getTextState(this.editor);
     switch (command) {
         case "bold":
-            Bold.execute(this.editor, textState);
+            Bold.execute(textState);
             break;
         case "italic":
             Italic.execute(this.editor, textState);
@@ -100,7 +95,7 @@ Editor.prototype.executeCommand = function (command, value) {
             Strikethrough.execute(this.editor, textState);
             break;
         case "header":
-            Header.execute(this.editor, textState, value);
+            Header.execute(value);
             break;
         case "unordered-list":
             UnorderedList.execute(this.editor, textState, "unordered");

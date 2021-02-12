@@ -2,8 +2,19 @@
 
 - [x] Word commands: don't select the entire word
 - [ ] Add jsdoc to new undocumented functions
+- [ ] Syntax highlighting on toolbar action
+- [ ] Fix empty new line bug (repro: 2 new lines, and type text)
+- [ ] Convert Editor and Toolbar to object literals
 - [ ] Add namespaces to utilities
-- [ ] Header sytnax highlighting
+- [x] Header sytnax highlighting
 - [ ] Remove setSelection
 - [ ] Remove Cursor
 - [ ] Fix command + Z
+- [ ] Refactor commands:
+    - [x] Bold
+    - [x] Header
+    - [ ] Italic
+    - [ ] Strikethrough
+    - [ ] Blockqoute
+    - [ ] Link
+    - [ ] Unordered list

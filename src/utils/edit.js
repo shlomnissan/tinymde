@@ -93,11 +93,25 @@ export function getContentsInActiveRange({ start, end }) {
     return range.cloneContents().textContent;
 }
 
+export function getParagraph() {
+    let container = window.getSelection().anchorNode.parentElement;
+    while (!container.classList.contains("tinymde-paragraph")) {
+        if (container.parentElement === null) return;
+        container = container.parentElement;
+    }
+    return container;
+}
+
 export function selectContents(element, offset) {
     const sel = window.getSelection();
     const range = new Range();
-    range.setStart(element.firstChild, offset);
-    range.setEnd(element.firstChild, element.innerText.length - offset);
+    if (element.nodeType === Node.TEXT_NODE) {
+        range.setStart(element.firstChild, offset);
+        range.setEnd(element.firstChild, element.innerText.length - offset);
+    } else {
+        range.setStart(element.firstChild, 0);
+        range.setEndAfter(element.lastChild);
+    }
     sel.removeAllRanges();
     sel.addRange(range);
 }

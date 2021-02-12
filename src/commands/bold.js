@@ -13,10 +13,9 @@ const Bold = {
 
     offset: 2,
 
-    execute: function (editor, state) {
-        let node = this.getNode();
-        let sel = window.getSelection();
-
+    execute: function (state) {
+        const node = this.getNode();
+        const sel = window.getSelection();
         if (!node || !sel) return;
 
         const isMarkdown = state.text.match(this.regex);
@@ -25,7 +24,7 @@ const Bold = {
             const word = isMarkdown[0];
             selectContents(node, 0);
             insertText(
-                editor,
+                node,
                 word.substring(this.offset, word.length - this.offset)
             );
 
@@ -46,12 +45,12 @@ const Bold = {
 
             // Clean invalid markdown
             if (selection === "****" || selection === "**") {
-                insertText(editor, "");
+                insertText(node, "");
                 return;
             }
 
             // Insert selected content in-place
-            insertText(editor, `**${selection}**`);
+            insertText(node, `**${selection}**`);
 
             // If a word wasn't selected, set the position
             if (!selection) {

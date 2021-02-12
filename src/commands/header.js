@@ -1,37 +1,47 @@
-import { setSelection, stripParagraphMarkdown } from "../utils/edit";
+import {
+    selectContents,
+    stripParagraphMarkdown,
+    getParagraph,
+} from "../utils/edit";
+import Cursor from "../utils/cursor";
 import insertText from "../utils/text";
 
-const Header = function () {};
+const Header = {
+    regex: /^(\#{1,6}\s)(.*)/g,
 
-/**
- * Toggle header markdown to current paragraph.
- * @param {HTMLDivElement} editor - contentEditable div tag.
- * @param {Object} state - { text: string, position: number }
- * @param {number} size - 1, 2, ... 6
- */
-Header.prototype.execute = function (editor, state, size) {
-    const regex = new RegExp(`^(\\#{${size}}\\s)(.*?)`, "g");
-    const offset = size + 1;
+    execute(size) {
+        const node = getParagraph();
+        if (!node) return;
 
-    let text = "";
-    let cursor = { start: 0, end: 0 };
+        let offset = size + 1;
+        let text = node.innerText;
 
-    const addMarkdown = () => {
-        const stripped = stripParagraphMarkdown(state.text);
-        text = `${"#".repeat(size)} ${stripped.text}`;
-        cursor = state.position + offset - stripped.offset;
-        setSelection({ start: 0, end: state.text.length });
-    };
+        const isMarkdown = node.innerText.match(
+            // Dynamic regex, specific to the header size
+            new RegExp(`^(\\#{${size}}\\s)(.*?)`, "g")
+        );
 
-    const stripMarkdown = () => {
-        text = state.text.substring(size + 1, state.text.length);
-        cursor = Math.max(state.position - offset, 0);
-        setSelection({ start: 0, end: state.text.length });
-    };
+        // Get the cursor's position, relative to the paragraph
+        const pos = Cursor.getCurrentCursorPosition(node);
 
-    state.text.match(regex) ? stripMarkdown() : addMarkdown();
-    insertText(editor, text);
-    setSelection({ start: cursor, end: cursor });
+        selectContents(node, 0);
+
+        if (isMarkdown) {
+            // Strip markdown
+            text = text.substring(offset, text.length);
+            insertText(node, text);
+            offset = pos - offset;
+        } else {
+            // Insert header markdown (strip existing paragraph markdown if needed)
+            const stripped = stripParagraphMarkdown(text);
+            text = `${"#".repeat(size)} ${stripped.text}`;
+            insertText(node, text);
+            offset = pos + offset - stripped.offset;
+        }
+
+        // Set the cursor's position, relative to the paragraph
+        Cursor.setCurrentCursorPosition(offset, node);
+    },
 };
 
-export default new Header();
+export default Header;
