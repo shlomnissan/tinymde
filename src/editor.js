@@ -25,7 +25,6 @@ const Editor = function (root) {
 
     root.append(this.editor);
     initializeShortcuts(this.editor);
-
     dispatchCallbacks(this.editor, this.callbacks);
     clipboardPaste(this.editor);
     addShortcuts.apply(this);

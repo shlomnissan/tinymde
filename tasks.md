@@ -11,6 +11,7 @@
 - [ ] Remove setSelection
 - [x] Convert cursor to an object literal
 - [ ] Fix command + Z
+- [ ] Wrap commands in an object literal
 - [ ] Commands:
     - [x] Bold
     - [x] Header

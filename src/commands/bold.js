@@ -7,7 +7,7 @@ import {
 import insertText from "../utils/text";
 
 const Bold = {
-    regex: /\*\*(.*?).\*\*/gm,
+    regex: /(\*{2,3})(.+?)(\1)/gm,
     offset: 2,
     execute: function (state) {
         const node = window.getSelection().baseNode?.parentNode;
@@ -25,8 +25,9 @@ const Bold = {
             if (sel.isCollapsed) {
                 // There's no selection, get nearest word
                 selectionRange = getSurroundingWord(state.text, state.position);
-                selection = getContentsInActiveRange(selectionRange);
             }
+
+            selection = getContentsInActiveRange(selectionRange);
 
             // Clean invalid markdown
             if (selection === "****" || selection === "**") {
@@ -49,10 +50,7 @@ const Bold = {
         const stripMarkdown = () => {
             const word = isMarkdown[0];
             selectContents(node, 0);
-            insertText(
-                node,
-                word.substring(this.offset, word.length - this.offset)
-            );
+            insertText(node, word.replace(this.regex, "$2"));
             setCursorInActiveRange(state.position - this.offset);
         };
 
