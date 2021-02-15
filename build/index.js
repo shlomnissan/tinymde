@@ -1,6 +1,6 @@
 /*!
  * 
- *   @betamark/tinymde v0.0.3
+ *   @betamark/tinymde v0.0.4
  *   git+https://github.com/shlomnissan/tinymde.git
  *
  *   Copyright (c) Shlomi Nissan (https://github.com/shlomnissan)
