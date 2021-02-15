@@ -22,7 +22,7 @@ Syntax.tokenize = function tokenize(str) {
                 Commands.Strikethrough.regex,
                 "<strike>$1</strike>"
             );
-            if (paragraphs.length > 1) {
+            if (paragraphs.length) {
                 output += `<div class="tinymde-paragraph">${para}</div>`;
             } else {
                 output += para;
