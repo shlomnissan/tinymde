@@ -1,6 +1,6 @@
 {
   "name": "@betamark/tinymde",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Simple markdown editor written in plain JavaScript",
   "main": "build/index.js",
   "scripts": {
