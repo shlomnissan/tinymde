@@ -41,6 +41,14 @@ export function getSurroundingWord(text, position) {
     return { start, end };
 }
 
+export function getSelectionRange() {
+    const sel = window.getSelection();
+    return {
+        start: Math.min(sel.anchorOffset, sel.focusOffset),
+        end: Math.max(sel.anchorOffset, sel.focusOffset),
+    };
+}
+
 /**
  * Returns the text and cursor's position.
  * @param {HTMLDivElement} editor - contentEditable div tag.

@@ -1,41 +1,49 @@
-import { getSurroundingWord, setSelection } from "../utils/edit";
+import {
+    getContentsInActiveRange,
+    getSelectionRange,
+    getSurroundingWord,
+    selectContents,
+    setCursorInActiveRange,
+} from "../utils/edit";
 import insertText from "../utils/text";
 
-const Strikethrough = function () {};
+const Strikethrough = {
+    regex: /~(.+?)~/g,
+    offset: 1,
+    execute: function (state) {
+        const node = window.getSelection().baseNode?.parentNode;
+        const sel = window.getSelection();
+        if (!node || !sel) return;
 
-/**
- * Toggle strikethrough markdown to current word and select it.
- * @param {HTMLDivElement} editor - contentEditable div tag.
- * @param {Object} textState - { text: string, position: number }
- */
-Strikethrough.prototype.execute = function (editor, state) {
-    const regex = /(\~{1})(.*?)(\1)/g;
-    const wordOffset = getSurroundingWord(state.text, state.position);
-    const mdOffset = 1;
+        const addMarkdown = () => {
+            let selection = "";
+            let selectionRange = getSelectionRange();
+            if (sel.isCollapsed) {
+                selectionRange = getSurroundingWord(state.text, state.position);
+            }
+            selection = getContentsInActiveRange(selectionRange);
 
-    let text = "";
-    let selection = { start: 0, end: 0 };
+            insertText(node, `~${selection}~`);
 
-    const addMarkdown = () => {
-        text = `~${word}~`;
-        selection = {
-            start: wordOffset.start + mdOffset,
-            end: wordOffset.end + mdOffset,
+            if (!selection) {
+                setCursorInActiveRange(state.position + this.offset);
+            } else {
+                setTimeout(() => {
+                    setCursorInActiveRange(selection.length + this.offset);
+                }, 10);
+            }
         };
-    };
 
-    const stripMarkdown = () => {
-        text = word.replace(regex, "$2");
-        selection = {
-            start: state.position - mdOffset,
-            end: state.position - mdOffset,
+        const stripMarkdown = () => {
+            const word = isMarkdown[0];
+            selectContents(node, 0);
+            insertText(node, word.replace(this.regex, "$1"));
+            setCursorInActiveRange(state.position - this.offset);
         };
-    };
 
-    const word = setSelection(wordOffset);
-    word.match(regex) ? stripMarkdown() : addMarkdown();
-    insertText(editor, text);
-    setSelection(selection);
+        const isMarkdown = state.text.match(this.regex);
+        isMarkdown ? stripMarkdown() : addMarkdown();
+    },
 };
 
-export default new Strikethrough();
+export default Strikethrough;

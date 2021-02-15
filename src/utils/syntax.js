@@ -1,4 +1,4 @@
-import Bold from "../commands/bold";
+import Commands from "../commands/commands";
 
 const Syntax = {};
 
@@ -8,7 +8,16 @@ Syntax.tokenize = function tokenize(str) {
     paragraphs.forEach((para) => {
         if (para.trim().length) {
             para = tokenizeHeader(para);
-            para = tokenizeBold(para);
+            para = tokenizeWord(
+                para,
+                Commands.Bold.regex,
+                "<strong>$1</strong>"
+            );
+            para = tokenizeWord(
+                para,
+                Commands.Strikethrough.regex,
+                "<strike>$1</strike>"
+            );
             if (paragraphs.length > 1) {
                 output += `<div class="tinymde-paragraph">${para}</div>`;
             } else {
@@ -23,16 +32,14 @@ Syntax.tokenize = function tokenize(str) {
 
 export default Syntax;
 
-function tokenizeBold(paragraph) {
-    const bold_md = paragraph.match(Bold.regex);
-    if (bold_md) {
-        bold_md.forEach((match) => {
-            paragraph = paragraph
-                .split(match)
-                .join(`<strong>${match}</strong>`);
+function tokenizeWord(str, regex, pattern) {
+    const matches = str.match(regex);
+    if (matches) {
+        matches.forEach((match) => {
+            str = str.split(match).join(pattern.replace("$1", match));
         });
     }
-    return paragraph;
+    return str;
 }
 
 function tokenizeHeader(paragraph) {

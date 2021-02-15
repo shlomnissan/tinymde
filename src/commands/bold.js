@@ -3,6 +3,7 @@ import {
     selectContents,
     setCursorInActiveRange,
     getContentsInActiveRange,
+    getSelectionRange,
 } from "../utils/edit";
 import insertText from "../utils/text";
 
@@ -15,15 +16,9 @@ const Bold = {
         if (!node || !sel) return;
 
         const addMarkdown = () => {
-            // Get the current selection
             let selection = "";
-            let selectionRange = {
-                start: Math.min(sel.anchorOffset, sel.focusOffset),
-                end: Math.max(sel.anchorOffset, sel.focusOffset),
-            };
-
+            let selectionRange = getSelectionRange();
             if (sel.isCollapsed) {
-                // There's no selection, get nearest word
                 selectionRange = getSurroundingWord(state.text, state.position);
             }
 
@@ -41,7 +36,6 @@ const Bold = {
                 setCursorInActiveRange(state.position + this.offset);
             } else {
                 setTimeout(() => {
-                    // Set the position after syntax highlighting
                     setCursorInActiveRange(selection.length + this.offset);
                 }, 10);
             }

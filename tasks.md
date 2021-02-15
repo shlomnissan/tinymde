@@ -16,7 +16,7 @@
     - [x] Bold
     - [x] Header
     - [ ] Italic
-    - [ ] Strikethrough
+    - [x] Strikethrough
     - [ ] Blockqoute
     - [ ] Link
     - [ ] Unordered list

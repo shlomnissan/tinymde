@@ -91,7 +91,7 @@ Editor.prototype.executeCommand = function (command, value) {
             Italic.execute(this.editor, textState);
             break;
         case "strikethrough":
-            Strikethrough.execute(this.editor, textState);
+            Strikethrough.execute(textState);
             break;
         case "header":
             Header.execute(value);
