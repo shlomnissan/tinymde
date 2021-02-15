@@ -4,7 +4,7 @@
 - [ ] Add jsdoc to new undocumented functions
 - [x] Run Syntax highlighting on toolbar action
 - [ ] Fix empty new line bug (repro: 2 new lines, and type text)
-- [ ] Indent headers
+- [x] Add gutter to paragraph markdown
 - [ ] Convert Editor and Toolbar to object literals
 - [ ] Add namespaces to utilities
 - [x] Header sytnax highlighting

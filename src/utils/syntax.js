@@ -7,7 +7,11 @@ Syntax.tokenize = function tokenize(str) {
     const paragraphs = str.split("\n");
     paragraphs.forEach((para) => {
         if (para.trim().length) {
-            para = tokenizeHeader(para);
+            para = tokenizeParagraph(
+                para,
+                /^(\#{1,6}\s)(.+)/g,
+                "<strong>$1</strong>"
+            );
             para = tokenizeWord(
                 para,
                 Commands.Bold.regex,
@@ -42,14 +46,27 @@ function tokenizeWord(str, regex, pattern) {
     return str;
 }
 
-function tokenizeHeader(paragraph) {
-    const header_md = paragraph.match(/^(\#{1,6}\s)(.*)/g);
-    if (header_md) {
-        header_md.forEach((match) => {
-            paragraph = paragraph
-                .split(match)
-                .join(`<strong>${match}</strong>`);
+function tokenizeParagraph(str, regex, pattern) {
+    const matches = str.match(regex);
+    if (matches) {
+        matches.forEach((match) => {
+            const markdown = str.match(/^(.+?)\s/g);
+            match = match.replace(/^(\#{1,6}\s)/g, "");
+            str = `<strong><span class="gutter">${markdown[0]}</span>${match}</strong>`;
         });
     }
-    return paragraph;
+
+    setTimeout(() => {
+        const paragraphs = document.querySelectorAll(".tinymde-paragraph");
+        paragraphs.forEach((para) => {
+            const gutter = para.querySelector(".gutter");
+            if (gutter) {
+                para.style.textIndent = `-${gutter.offsetWidth}px`;
+            } else {
+                para.style.textIndent = 0;
+            }
+        });
+    });
+
+    return str;
 }
