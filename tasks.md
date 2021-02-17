@@ -8,15 +8,15 @@
 - [ ] Convert Editor and Toolbar to object literals
 - [ ] Add namespaces to utilities
 - [x] Header sytnax highlighting
-- [ ] Remove setSelection
+- [x] Remove setSelection
 - [x] Convert cursor to an object literal
 - [ ] Fix command + Z
 - [ ] Wrap commands in an object literal
 - [ ] Commands:
     - [x] Bold
     - [x] Header
+    - [ ] Strikethrough
     - [ ] Italic
-    - [x] Strikethrough
     - [ ] Blockqoute
     - [ ] Link
     - [ ] Unordered list

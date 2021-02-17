@@ -1,118 +1,98 @@
 import { getTextState, getParagraph } from "./utils/edit";
 
 import Shortcut, { initializeShortcuts } from "./shortcut";
-import Bold from "./commands/bold";
-import Italic from "./commands/italic";
-import Strikethrough from "./commands/strikethrough";
-import Header from "./commands/header";
-import UnorderedList from "./commands/unordered_list";
-import Blockquote from "./commands/blockquote";
-import Link from "./commands/link";
+import Commands from "./commands/commands";
 import Cursor from "./utils/cursor";
 import Syntax from "./utils/syntax";
 
-/**
- * Editor object.
- * @constructor
- * @param {HTMLDivElement} root - The root HTML object.
- */
-const Editor = function (root) {
-    this.editor = document.createElement("div");
-    this.editor.id = "tinymde-editor";
-    this.editor.contentEditable = true;
-    this.editor.spellcheck = false;
-    this.callbacks = {};
+const Editor = {
+    editor: document.createElement("div"),
+    callbacks: {},
 
-    root.append(this.editor);
-    initializeShortcuts(this.editor);
-    dispatchCallbacks(this.editor, this.callbacks);
-    clipboardPaste(this.editor);
-    addShortcuts.apply(this);
+    init: function (root) {
+        this.editor.id = "tinymde-editor";
+        this.editor.contentEditable = true;
+        this.editor.spellcheck = false;
 
-    Object.defineProperty(this, "content", {
-        get: function () {
-            return this.editor.innerText;
-        },
-        set: function (val) {
-            this.editor.innerHTML = Syntax.tokenize(val);
-            setTimeout(() => {
-                Cursor.setCurrentCursorPosition(
-                    this.editor.innerText.length,
-                    this.editor
+        root.append(this.editor);
+        initializeShortcuts(this.editor);
+        dispatchCallbacks(this.editor, this.callbacks);
+        clipboardPaste(this.editor);
+        addShortcuts.apply(this);
+
+        Object.defineProperty(this, "content", {
+            get: function () {
+                return this.editor.innerText;
+            },
+            set: function (val) {
+                this.editor.innerHTML = Syntax.tokenize(val);
+                setTimeout(() => {
+                    Cursor.setCurrentCursorPosition(
+                        this.editor.innerText.length,
+                        this.editor
+                    );
+                });
+            },
+            configurable: false,
+            enumerable: false,
+        });
+
+        this.editor.addEventListener("keydown", (event) => {
+            if (event.key.length !== 1 && event.key !== "Backspace") return;
+            this.runSyntaxHighlighter();
+        });
+
+        this.editor.focus();
+    },
+
+    runSyntaxHighlighter: function () {
+        setTimeout(() => {
+            const container = getParagraph();
+            if (container) {
+                if (container.innerText.length === 0) return;
+                const offset = Cursor.getCurrentCursorPosition(container);
+                container.innerHTML = Syntax.tokenize(
+                    container.innerText,
+                    true
                 );
-            });
-        },
-        configurable: false,
-        enumerable: false,
-    });
+                Cursor.setCurrentCursorPosition(offset, container);
+            }
+        });
+    },
 
-    this.editor.addEventListener("keydown", (event) => {
-        if (event.key.length !== 1 && event.key !== "Backspace") return;
-        this.runSyntaxHighlighter();
-    });
+    addEventListener: function (event, fn) {
+        this.callbacks[event] = fn;
+    },
 
-    this.editor.focus();
-};
-
-Editor.prototype.runSyntaxHighlighter = function () {
-    setTimeout(() => {
-        const container = getParagraph();
-        if (container) {
-            if (container.innerText.length === 0) return;
-            const offset = Cursor.getCurrentCursorPosition(container);
-            container.innerHTML = Syntax.tokenize(container.innerText, true);
-            Cursor.setCurrentCursorPosition(offset, container);
+    executeCommand: function (command, value) {
+        const textState = getTextState(this.editor);
+        switch (command) {
+            case "bold":
+                Commands.Bold.execute(textState);
+                break;
+            case "strikethrough":
+                break;
+            case "italic":
+                break;
+            case "header":
+                Commands.Header.execute(value);
+                break;
+            case "unordered-list":
+                break;
+            case "ordered-list":
+                break;
+            case "blockquote":
+                break;
+            case "link":
+                break;
+            default:
+                console.error(`TinyMDE: ${command} is an invalid command.`);
+                break;
         }
-    });
+    },
 };
 
-/**
- * Propogate event listeners.
- * Currently supporting onkeypress, onmousemove, onkeyup.
- * @param  {string} event
- * @param  {function} fn
- */
-Editor.prototype.addEventListener = function (event, fn) {
-    this.callbacks[event] = fn;
-};
-
-/**
- * Executes command.
- * @param {string} command
- * @param {any} value
- */
-Editor.prototype.executeCommand = function (command, value) {
-    const textState = getTextState(this.editor);
-    switch (command) {
-        case "bold":
-            Bold.execute(textState);
-            break;
-        case "italic":
-            Italic.execute(this.editor, textState);
-            break;
-        case "strikethrough":
-            Strikethrough.execute(textState);
-            break;
-        case "header":
-            Header.execute(value);
-            break;
-        case "unordered-list":
-            UnorderedList.execute(this.editor, textState, "unordered");
-            break;
-        case "ordered-list":
-            // TODO: implement
-            break;
-        case "blockquote":
-            Blockquote.execute(this.editor, textState);
-            break;
-        case "link":
-            Link.execute(this.editor, textState);
-            break;
-        default:
-            console.error(`TinyMDE: ${command} is an invalid command.`);
-            break;
-    }
-};
+export default Editor;
 
 /**
  * Registers event listeners and dispatch callbacks.
@@ -201,5 +181,3 @@ function clipboardPaste(editor) {
         }
     };
 }
-
-export default Editor;

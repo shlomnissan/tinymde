@@ -125,25 +125,6 @@ export function selectContents(element, offset) {
 }
 
 /**
- * @deprecated
- */
-export function setSelection({ start, end }) {
-    const range = getActiveRange();
-    if (!range) return;
-
-    let container = range.startContainer;
-    if (container.nodeType !== Node.TEXT_NODE) {
-        container = range.startContainer.childNodes.length
-            ? range.startContainer.childNodes[0]
-            : null;
-    }
-    if (container === null) return;
-    range.setStart(container, start);
-    range.setEnd(container, end);
-    return range.cloneContents().textContent;
-}
-
-/**
  * Strips paragraph markdown (headers, blockquote, list)
  * @param {string} text - The paragraph's text
  * @return {Object} - { text: string, offset: number }

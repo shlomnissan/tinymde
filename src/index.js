@@ -27,7 +27,8 @@ const TinyMDE = function (editorSelector, config = {}) {
     config = validateConfig(config);
     this.config = { ...__config, ...config };
 
-    this.editor = new Editor(root);
+    this.editor = Editor;
+    this.editor.init(root);
 
     if (this.config.showToolbar) {
         this.toolbar = new Toolbar(root, this.executeCommand.bind(this));

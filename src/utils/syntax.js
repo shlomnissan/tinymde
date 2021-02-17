@@ -17,11 +17,6 @@ Syntax.tokenize = function tokenize(str) {
                 Commands.Bold.regex,
                 "<strong>$1</strong>"
             );
-            para = tokenizeWord(
-                para,
-                Commands.Strikethrough.regex,
-                "<strike>$1</strike>"
-            );
             if (paragraphs.length) {
                 output += `<div class="tinymde-paragraph">${para}</div>`;
             } else {
