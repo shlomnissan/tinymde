@@ -74,7 +74,6 @@ TinyMDE.prototype.getContent = function () {
  * @param {any} value - optional value.
  */
 TinyMDE.prototype.executeCommand = function (command, value = "") {
-    Editor.runSyntaxHighlighter();
     Editor.executeCommand(command, value);
 };
 

@@ -1,5 +1,6 @@
 ### Tasks:
 
+- [ ] Add virtual document model
 - [x] Word commands: don't select the entire word
 - [ ] Add jsdoc to new undocumented functions
 - [x] Run Syntax highlighting on toolbar action

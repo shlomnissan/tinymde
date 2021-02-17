@@ -3,7 +3,7 @@ import { getTextState, getParagraph } from "./utils/edit";
 import Shortcut, { initializeShortcuts } from "./shortcut";
 import Commands from "./commands/commands";
 import Cursor from "./utils/cursor";
-import Syntax from "./utils/syntax";
+import Document from "./document";
 
 const Editor = {
     editor: document.createElement("div"),
@@ -13,6 +13,8 @@ const Editor = {
         this.editor.id = "tinymde-editor";
         this.editor.contentEditable = true;
         this.editor.spellcheck = false;
+
+        Document.init(this.editor);
 
         root.append(this.editor);
         initializeShortcuts(this.editor);
@@ -25,13 +27,8 @@ const Editor = {
                 return this.editor.innerText;
             },
             set: function (val) {
-                this.editor.innerHTML = Syntax.tokenize(val);
-                setTimeout(() => {
-                    Cursor.setCurrentCursorPosition(
-                        this.editor.innerText.length,
-                        this.editor
-                    );
-                });
+                Document.reset(val);
+                Document.render(this.editor);
             },
             configurable: false,
             enumerable: false,
@@ -39,25 +36,10 @@ const Editor = {
 
         this.editor.addEventListener("keydown", (event) => {
             if (event.key.length !== 1 && event.key !== "Backspace") return;
-            this.runSyntaxHighlighter();
+            Document.update();
         });
 
         this.editor.focus();
-    },
-
-    runSyntaxHighlighter: function () {
-        setTimeout(() => {
-            const container = getParagraph();
-            if (container) {
-                if (container.innerText.length === 0) return;
-                const offset = Cursor.getCurrentCursorPosition(container);
-                container.innerHTML = Syntax.tokenize(
-                    container.innerText,
-                    true
-                );
-                Cursor.setCurrentCursorPosition(offset, container);
-            }
-        });
     },
 
     addEventListener: function (event, fn) {
