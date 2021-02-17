@@ -94,11 +94,6 @@ const Editor = {
 
 export default Editor;
 
-/**
- * Registers event listeners and dispatch callbacks.
- * @param  {Editor} editor
- * @param  {string: function} callbacks
- */
 function dispatchCallbacks(editor, callbacks) {
     editor.onkeypress = (event) => {
         if ("onkeypress" in callbacks) {
@@ -117,10 +112,6 @@ function dispatchCallbacks(editor, callbacks) {
     };
 }
 
-/**
- * Add keyboard shortcut combinations and trigger MD commands.
- * This function is called using .apply() to set this as the editor object.
- */
 function addShortcuts() {
     Shortcut("Tab", (event) => {
         event.preventDefault();
@@ -168,10 +159,6 @@ function addShortcuts() {
     });
 }
 
-/**
- * Listen to onpaste and insert plain text.
- * @param  {Editor} editor
- */
 function clipboardPaste(editor) {
     editor.onpaste = (event) => {
         event.preventDefault();

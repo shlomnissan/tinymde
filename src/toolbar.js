@@ -21,50 +21,38 @@ const commands = [
     ["link"],
 ];
 
-/**
- * Toolbar object.
- * @constructor
- * @param {HTMLDivElement} root - The root HTML object.
- */
-const Toolbar = function (root, handleCommand) {
-    this.handleCommand = handleCommand;
-    this.toolbar = document.createElement("div");
-    this.toolbar.id = "tinymde-toolbar";
-    root.append(this.toolbar);
-    renderToolbar.call(this);
+const Toolbar = {
+    toolbar: document.createElement("div"),
+
+    init: function (root, handleCommand) {
+        this.handleCommand = handleCommand;
+        this.toolbar = document.createElement("div");
+        this.toolbar.id = "tinymde-toolbar";
+        root.append(this.toolbar);
+        renderToolbar.call(this);
+    },
+
+    hide: function () {
+        this.toolbar.classList.add("hide");
+    },
+
+    show: function () {
+        this.toolbar.classList.remove("hide");
+    },
+
+    setWordCount: function (count) {
+        let wordCountEl = this.toolbar.querySelector("#tinymde-word-count");
+        if (!wordCountEl) {
+            wordCountEl = document.createElement("div");
+            wordCountEl.id = "tinymde-word-count";
+            this.toolbar.append(wordCountEl);
+        }
+        wordCountEl.innerHTML = `<p>${count} Words</p>`;
+    },
 };
 
-/**
- * Hide toolbar, if it's showing, by adding the "hide" CSS class.
- */
-Toolbar.prototype.hideToolbar = function () {
-    this.toolbar.classList.add("hide");
-};
+export default Toolbar;
 
-/**
- * Show toolbar, if it's hidden, by removing the "hide" CSS class.
- */
-Toolbar.prototype.showToolbar = function () {
-    this.toolbar.classList.remove("hide");
-};
-
-/**
- * Renders word count if needed and update count.
- * @param  {number} count
- */
-Toolbar.prototype.setWordCount = function (count) {
-    let wordCountEl = this.toolbar.querySelector("#tinymde-word-count");
-    if (!wordCountEl) {
-        wordCountEl = document.createElement("div");
-        wordCountEl.id = "tinymde-word-count";
-        this.toolbar.append(wordCountEl);
-    }
-    wordCountEl.innerHTML = `<p>${count} Words</p>`;
-};
-
-/**
- * Renders toolbar buttons.
- */
 function renderToolbar() {
     commands.forEach((group) => {
         const group_el = document.createElement("div");
@@ -109,11 +97,6 @@ function renderToolbar() {
     });
 }
 
-/**
- * Creates a simple HTML button.
- * @param {string} className
- * @return {HTMLButtonElement}
- */
 function makeButton(className, label = "") {
     const buttonWrapper = document.createElement("div");
     buttonWrapper.className = "button-wrapper";
@@ -128,13 +111,6 @@ function makeButton(className, label = "") {
     return buttonWrapper;
 }
 
-/**
- * Creates command options selection.
- * @param {string} command
- * @param {HTMLDivElement} button
- * @param {Object} options - key/value options.
- * @param {string} optionsType
- */
 function makeOptions(command, button, optionsList, optionsType) {
     const options = document.createElement("div");
     options.className = `options ${optionsType}`;
@@ -146,5 +122,3 @@ function makeOptions(command, button, optionsList, optionsType) {
     });
     button.append(options);
 }
-
-export default Toolbar;

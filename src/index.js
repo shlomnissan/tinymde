@@ -27,26 +27,25 @@ const TinyMDE = function (editorSelector, config = {}) {
     config = validateConfig(config);
     this.config = { ...__config, ...config };
 
-    this.editor = Editor;
-    this.editor.init(root);
+    Editor.init(root);
 
     if (this.config.showToolbar) {
-        this.toolbar = new Toolbar(root, this.executeCommand.bind(this));
+        Toolbar.init(root, this.executeCommand.bind(this));
 
         if (this.config.toggleToolbar) {
-            this.editor.addEventListener("onkeypress", () => {
-                this.toolbar.hideToolbar();
+            Editor.addEventListener("onkeypress", () => {
+                Toolbar.hideToolbar();
             });
-            this.editor.addEventListener("onmousemove", () => {
-                this.toolbar.showToolbar();
+            Editor.addEventListener("onmousemove", () => {
+                Toolbar.showToolbar();
             });
         }
 
         if (this.config.showWordCount) {
-            this.editor.addEventListener("onkeyup", () => {
-                this.toolbar.setWordCount(wordCount(this.editor.content));
+            Editor.addEventListener("onkeyup", () => {
+                Toolbar.setWordCount(wordCount(Editor.content));
             });
-            this.toolbar.setWordCount(0);
+            Toolbar.setWordCount(0);
         }
     }
 };
@@ -56,9 +55,9 @@ const TinyMDE = function (editorSelector, config = {}) {
  * @param {string} content - the new content.
  */
 TinyMDE.prototype.setContent = function (content) {
-    this.editor.content = content;
+    Editor.content = content;
     if (this.config.showToolbar && this.config.showWordCount) {
-        this.toolbar.setWordCount(wordCount(content));
+        Toolbar.setWordCount(wordCount(content));
     }
 };
 
@@ -66,7 +65,7 @@ TinyMDE.prototype.setContent = function (content) {
  * Returns the content as plain text.
  */
 TinyMDE.prototype.getContent = function () {
-    return this.editor.content;
+    return Editor.content;
 };
 
 /**
@@ -75,8 +74,8 @@ TinyMDE.prototype.getContent = function () {
  * @param {any} value - optional value.
  */
 TinyMDE.prototype.executeCommand = function (command, value = "") {
-    this.editor.runSyntaxHighlighter();
-    this.editor.executeCommand(command, value);
+    Editor.runSyntaxHighlighter();
+    Editor.executeCommand(command, value);
 };
 
 /**
