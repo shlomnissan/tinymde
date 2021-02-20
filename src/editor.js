@@ -35,6 +35,19 @@ const Editor = {
         });
 
         this.editor.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                Document.create();
+                return;
+            }
+
+            if (event.key === "Backspace") {
+                if (Document.delete()) {
+                    event.preventDefault();
+                    return;
+                }
+            }
+
             if (event.key.length !== 1 && event.key !== "Backspace") return;
             Document.update();
         });

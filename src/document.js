@@ -28,11 +28,11 @@ const Document = {
             }
 
             if (type === "new-line") {
-                this.root[nid].html = "<br/>";
+                this.root[nid].html = "<br>";
             }
         });
         if (paragraphs.length) {
-            setCursorEndDocument(this.editor);
+            setCursorEndDocument();
         }
     },
 
@@ -58,6 +58,8 @@ const Document = {
             const { type, metadata } = getParagraphType(el.innerText);
 
             node.text = el.innerText;
+            node.html = el.innerHTML;
+
             let dirty = false;
 
             // test for paragraph type changes
@@ -89,6 +91,31 @@ const Document = {
         });
     },
 
+    create: function () {
+        const el = getActiveParagraphElement();
+        const nid = parseInt(el.dataset.tnode) + 1;
+        const newRoot = {};
+
+        for (let i = 1; i < nid; ++i) {
+            newRoot[i] = this.root[i];
+        }
+
+        newRoot[nid] = {
+            type: "new-line",
+            metadata: {},
+            text: "",
+            html: "<br>",
+        };
+
+        for (let i = nid; i <= Object.keys(this.root).length; ++i) {
+            newRoot[i + 1] = this.root[i];
+        }
+
+        this.root = newRoot;
+        this.render();
+        setCursorInParagraphElement(nid);
+    },
+
     render: function () {
         let output = "";
         Object.keys(this.root).forEach((nodeId) => {
@@ -98,12 +125,26 @@ const Document = {
         });
         this.editor.innerHTML = output;
     },
-};
 
-let lastId = 0;
-function getNextId() {
-    return ++lastId;
-}
+    delete: function () {
+        const el = getActiveParagraphElement();
+        if (el.innerHTML === "<br>" || !el.innerHTML.length) {
+            const nid = parseInt(el.dataset.tnode);
+            const newRoot = {};
+            for (let i = 1; i < nid; ++i) {
+                newRoot[i] = this.root[i];
+            }
+            for (let i = nid + 1; i <= Object.keys(this.root).length; ++i) {
+                newRoot[i - 1] = this.root[i];
+            }
+            this.root = newRoot;
+            this.render();
+            setCursorInParagraphElement(nid - 1);
+            return true;
+        }
+        return false;
+    },
+};
 
 function getActiveParagraphElement() {
     let container = window.getSelection().anchorNode;
@@ -117,6 +158,19 @@ function getActiveParagraphElement() {
     return container;
 }
 
+let lastId = 0;
+function getNextId() {
+    return ++lastId;
+}
+
+function getParagraphElement(nid) {
+    const paragraphs = document.querySelectorAll(".tinymde-paragraph");
+    if (paragraphs.length >= nid) {
+        return paragraphs[nid - 1];
+    }
+    return null;
+}
+
 function getParagraphType(para) {
     if (para.length == 0) {
         return { type: "new-line", metadata: {} };
@@ -128,20 +182,30 @@ function getParagraphType(para) {
     return { type: "text", metadata: {} };
 }
 
-function setCursorEndDocument(editor) {
-    setTimeout(function () {
-        const range = new Range();
-        const sel = window.getSelection();
+function setCursorInParagraphElement(nid) {
+    const el = getParagraphElement(nid);
 
-        if (!editor.lastChild?.firstChild) {
-            return;
-        }
+    if (!el) return;
 
-        const el = editor.lastChild.firstChild;
-        range.setStart(el, el.length);
-        range.setEnd(el, el.length);
-        sel.removeAllRanges();
-        sel.addRange(range);
+    const range = new Range();
+    const sel = window.getSelection();
+
+    let lastChild = el.lastChild;
+    while (lastChild.lastChild) {
+        lastChild = lastChild.lastChild;
+    }
+    range.setStart(lastChild, lastChild.length);
+    range.setEnd(lastChild, lastChild.length);
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+function setCursorEndDocument() {
+    setTimeout(() => {
+        const paragraphs = document.querySelectorAll(".tinymde-paragraph");
+        if (!paragraphs.length) return;
+        const idx = paragraphs.length - 1;
+        setCursorInParagraphElement(paragraphs[idx].dataset.tnode);
     });
 }
 
