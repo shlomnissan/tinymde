@@ -12,7 +12,7 @@ const Document = {
         const paragraphs = content.split("\n");
         paragraphs.forEach((para) => {
             const nid = getNextId();
-            const { type, metadata } = getParagraphType(para);
+            const { type, metadata } = getNodeType(para);
             this.root[nid] = {
                 type,
                 metadata,
@@ -32,7 +32,10 @@ const Document = {
             }
         });
         if (paragraphs.length) {
-            setCursorEndDocument();
+            setTimeout(() => {
+                const nid = getLastNodeId();
+                setCursorInNode(nid);
+            });
         }
     },
 
@@ -48,14 +51,15 @@ const Document = {
 
         setTimeout(() => {
             // process update
-            const el = getActiveParagraphElement();
+            // TODO: use get selection
+            const el = getActiveNodeElement();
             const nid = el.dataset.tnode;
             const node = this.root[nid];
 
             if (node.text === el.text) return; // no modifications
 
             const cursorPos = Cursor.getCurrentCursorPosition(el);
-            const { type, metadata } = getParagraphType(el.innerText);
+            const { type, metadata } = getNodeType(el.innerText);
 
             node.text = el.innerText;
             node.html = el.innerHTML;
@@ -92,28 +96,30 @@ const Document = {
     },
 
     create: function () {
-        const el = getActiveParagraphElement();
-        const nid = parseInt(el.dataset.tnode) + 1;
-        const newRoot = {};
+        const info = getSelection();
+        let nid = info.nid;
+        let pos = "end";
 
-        for (let i = 1; i < nid; ++i) {
-            newRoot[i] = this.root[i];
+        if (info.isCollapsed) {
+            if (info.state === "start") {
+                // add empty paragraph above
+                const nextNid = nid - 1 == 0 ? 1 : nid - 1;
+                insertNode.call(this, nextNid, "new-line", {}, "", "<br>");
+                pos = "start";
+            }
+            if (info.state === "end") {
+                // add empty paragraph below
+                insertNode.call(this, nid + 1, "new-line", {}, "", "<br>");
+            }
+            if (info.state === "middle") {
+                // add paragraph below with content from middle
+            }
+        } else {
+            // split the paragraph and remove selection
         }
 
-        newRoot[nid] = {
-            type: "new-line",
-            metadata: {},
-            text: "",
-            html: "<br>",
-        };
-
-        for (let i = nid; i <= Object.keys(this.root).length; ++i) {
-            newRoot[i + 1] = this.root[i];
-        }
-
-        this.root = newRoot;
         this.render();
-        setCursorInParagraphElement(nid);
+        setCursorInNode(nid + 1, pos);
     },
 
     render: function () {
@@ -127,7 +133,8 @@ const Document = {
     },
 
     delete: function () {
-        const el = getActiveParagraphElement();
+        const el = getActiveNodeElement();
+        // TODO: fix delete on selection
         if (el.innerHTML === "<br>" || !el.innerHTML.length) {
             const nid = parseInt(el.dataset.tnode);
             const newRoot = {};
@@ -139,14 +146,49 @@ const Document = {
             }
             this.root = newRoot;
             this.render();
-            setCursorInParagraphElement(nid - 1);
+            setCursorInNode(nid - 1);
             return true;
         }
         return false;
     },
 };
 
-function getActiveParagraphElement() {
+let lastId = 0;
+function getNextId() {
+    return ++lastId;
+}
+
+function getSelection() {
+    const sel = window.getSelection();
+    const el = getActiveNodeElement();
+    if (!sel || !el) return;
+
+    const nid = parseInt(el.dataset.tnode);
+    const pos = Cursor.getCurrentCursorPosition(el);
+    let state = "inside";
+
+    if (pos === 0) state = "start";
+    if (pos === el.innerText.length) state = "end";
+    if (el.innerHTML === "<br>" || !el.innerText.length) {
+        state = "end";
+    }
+
+    let text = "";
+    if (!sel.isCollapsed) {
+        text = sel.getRangeAt(0).toString();
+    }
+
+    return {
+        el,
+        nid,
+        pos,
+        state,
+        text,
+        isCollapsed: sel.isCollapsed,
+    };
+}
+
+function getActiveNodeElement() {
     let container = window.getSelection().anchorNode;
     while (container.nodeType === Node.TEXT_NODE) {
         container = container.parentElement;
@@ -158,12 +200,7 @@ function getActiveParagraphElement() {
     return container;
 }
 
-let lastId = 0;
-function getNextId() {
-    return ++lastId;
-}
-
-function getParagraphElement(nid) {
+function getNodeElement(nid) {
     const paragraphs = document.querySelectorAll(".tinymde-paragraph");
     if (paragraphs.length >= nid) {
         return paragraphs[nid - 1];
@@ -171,7 +208,7 @@ function getParagraphElement(nid) {
     return null;
 }
 
-function getParagraphType(para) {
+function getNodeType(para) {
     if (para.length == 0) {
         return { type: "new-line", metadata: {} };
     }
@@ -182,31 +219,52 @@ function getParagraphType(para) {
     return { type: "text", metadata: {} };
 }
 
-function setCursorInParagraphElement(nid) {
-    const el = getParagraphElement(nid);
+function insertNode(nid, type, metadata = {}, text = "", html = "") {
+    const newRoot = {};
+    for (let i = 1; i < nid; ++i) {
+        newRoot[i] = this.root[i];
+    }
+    newRoot[nid] = {
+        type,
+        metadata,
+        text,
+        html,
+    };
+    for (let i = nid; i <= Object.keys(this.root).length; ++i) {
+        newRoot[i + 1] = this.root[i];
+    }
+    this.root = newRoot;
+}
+
+function setCursorInNode(nid, position = "end") {
+    const el = getNodeElement(nid);
 
     if (!el) return;
 
     const range = new Range();
     const sel = window.getSelection();
 
-    let lastChild = el.lastChild;
-    while (lastChild.lastChild) {
-        lastChild = lastChild.lastChild;
+    let child = position === "end" ? el.lastChild : el.firstChild;
+    if (position === "end") {
+        while (child.lastChild) {
+            child = child.lastChild;
+        }
+    } else {
+        while (child.firstChild) {
+            child = child.firstChild;
+        }
     }
-    range.setStart(lastChild, lastChild.length);
-    range.setEnd(lastChild, lastChild.length);
+
+    const pos = position === "end" ? child.length : 0;
+    range.setStart(child, pos);
+    range.setEnd(child, pos);
     sel.removeAllRanges();
     sel.addRange(range);
 }
 
-function setCursorEndDocument() {
-    setTimeout(() => {
-        const paragraphs = document.querySelectorAll(".tinymde-paragraph");
-        if (!paragraphs.length) return;
-        const idx = paragraphs.length - 1;
-        setCursorInParagraphElement(paragraphs[idx].dataset.tnode);
-    });
+function getLastNodeId() {
+    const paragraphs = document.querySelectorAll(".tinymde-paragraph");
+    return paragraphs.length;
 }
 
 // TODO: generalize to any paragraph markdown
