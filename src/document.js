@@ -1,4 +1,5 @@
 import Cursor from "./utils/cursor";
+import text from "./utils/text";
 
 const Document = {
     root: {},
@@ -96,6 +97,8 @@ const Document = {
     },
 
     create: function () {
+        // TODO: handle multiple node selection
+
         const info = getSelection();
         let nid = info.nid;
         let pos = "end";
@@ -103,7 +106,7 @@ const Document = {
         if (info.isCollapsed) {
             if (info.state === "start") {
                 // add empty paragraph above
-                const nextNid = nid - 1 == 0 ? 1 : nid - 1;
+                const nextNid = nid == 0 ? 1 : nid;
                 insertNode.call(this, nextNid, "new-line", {}, "", "<br>");
                 pos = "start";
             }
@@ -111,11 +114,30 @@ const Document = {
                 // add empty paragraph below
                 insertNode.call(this, nid + 1, "new-line", {}, "", "<br>");
             }
-            if (info.state === "middle") {
+            if (info.state === "inside") {
                 // add paragraph below with content from middle
+                const first = info.el.innerText.substr(0, info.pos);
+                const second = info.el.innerText.substr(info.pos);
+                split.call(this, first, second);
             }
         } else {
             // split the paragraph and remove selection
+            const first = info.el.innerText.substr(0, info.pos);
+            const second = info.el.innerText.substr(
+                info.pos + info.text.length
+            );
+            split.call(this, first, second);
+        }
+
+        function split(first, second) {
+            this.root[nid].text = first;
+            this.root[nid].html = first; // TODO: process tokens
+            if (!second.length) {
+                insertNode.call(this, nid + 1, "new-line", {}, "", "<br>");
+            } else {
+                insertNode.call(this, nid + 1, "text", {}, second, second);
+            }
+            pos = "start";
         }
 
         this.render();
@@ -164,7 +186,7 @@ function getSelection() {
     if (!sel || !el) return;
 
     const nid = parseInt(el.dataset.tnode);
-    const pos = Cursor.getCurrentCursorPosition(el);
+    let pos = Cursor.getCurrentCursorPosition(el);
     let state = "inside";
 
     if (pos === 0) state = "start";
@@ -176,6 +198,7 @@ function getSelection() {
     let text = "";
     if (!sel.isCollapsed) {
         text = sel.getRangeAt(0).toString();
+        pos = Math.min(sel.anchorOffset, sel.focusOffset);
     }
 
     return {
@@ -244,7 +267,7 @@ function setCursorInNode(nid, position = "end") {
     const range = new Range();
     const sel = window.getSelection();
 
-    let child = position === "end" ? el.lastChild : el.firstChild;
+    let child = el;
     if (position === "end") {
         while (child.lastChild) {
             child = child.lastChild;
