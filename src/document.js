@@ -30,18 +30,7 @@ const Document = {
                 text: para,
                 html: para,
             };
-
-            // TODO: generate HTML for node
-            if (type === "header") {
-                this.root[nid].html = setHeaderMarkup(
-                    this.root[nid].text,
-                    metadata.len
-                );
-            }
-            if (type === "new-line") {
-                this.root[nid].html = "<br>";
-            }
-            // --------
+            generateHTML.call(this, nid);
         });
         if (paragraphs.length) {
             setTimeout(() => {
@@ -61,7 +50,6 @@ const Document = {
         }
 
         setTimeout(() => {
-            // process update
             // TODO: use get selection
             const el = getActiveNodeElement();
             const nid = el.dataset.tnode;
@@ -82,16 +70,7 @@ const Document = {
                 dirty = true;
                 node.type = type;
                 node.metadata = metadata;
-
-                // TODO: ---- DRY ----
-                if (node.type === "text") {
-                    node.html = el.innerText;
-                }
-
-                if (node.type === "header") {
-                    node.html = setHeaderMarkup(node.text, node.metadata.len);
-                }
-                // --------------------
+                generateHTML.call(this, nid);
             }
 
             // TODO: test for markup changes
@@ -162,9 +141,7 @@ const Document = {
     render: function () {
         let output = "";
         Object.keys(this.root).forEach((nodeId) => {
-            const node = this.root[nodeId];
-            // TODO: this function shouldn't process HTML
-            output += `<div class="tinymde-paragraph" data-tnode="${nodeId}">${node.html}</div>`;
+            output += this.root[nodeId].html;
         });
         this.editor.innerHTML = output;
     },
@@ -268,6 +245,28 @@ function insertNode(nid, type, metadata = {}, text = "", html = "") {
         newRoot[i + 1] = this.root[i];
     }
     this.root = newRoot;
+}
+
+function generateHTML(nid) {
+    let base = `<div class="tinymde-paragraph" data-tnode="${nid}">$1</div>`;
+    const node = this.root[nid];
+
+    if (node.type === "text") {
+        base = base.replace(/\$1/g, node.text);
+    }
+
+    if (node.type === "header") {
+        let content = node.text.substr(node.metadata.len + 1);
+        const gutter = "#".repeat(node.metadata.len) + " ";
+        content = `<strong><span class="gutter">${gutter}</span>${content}</strong>`;
+        base = base.replace(/\$1/g, content);
+    }
+
+    if (node.type === "new-line") {
+        base = base.replace(/\$1/g, "<br>");
+    }
+
+    node.html = base;
 }
 
 function setCursorInNode(nid, position = "end") {
