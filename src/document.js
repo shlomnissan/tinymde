@@ -3,15 +3,26 @@ import Cursor from "./utils/cursor";
 const Document = {
     root: {},
     editor: null,
+    lastNode: 0,
 
+    /**
+     * Initialization - set the document render target.
+     * @param {HTMLElement} editor
+     */
     init: function (editor) {
         this.editor = editor;
     },
 
+    /**
+     * Build the entire document, render it, and set cursor at the end.
+     * This function should be used when the content is being reset dynamically.
+     * @param {string} content
+     */
     reset: function (content) {
+        this.root = {};
         const paragraphs = content.split("\n");
         paragraphs.forEach((para) => {
-            const nid = getNextId();
+            const nid = ++this.lastNode;
             const { type, metadata } = getNodeType(para);
             this.root[nid] = {
                 type,
@@ -20,21 +31,21 @@ const Document = {
                 html: para,
             };
 
+            // TODO: generate HTML for node
             if (type === "header") {
                 this.root[nid].html = setHeaderMarkup(
                     this.root[nid].text,
                     metadata.len
                 );
             }
-
             if (type === "new-line") {
                 this.root[nid].html = "<br>";
             }
+            // --------
         });
         if (paragraphs.length) {
             setTimeout(() => {
-                const nid = getLastNodeId();
-                setCursorInNode(nid);
+                setCursorInNode(this.lastNode);
             });
         }
     },
@@ -179,23 +190,16 @@ const Document = {
     },
 };
 
-// TODO: move into the object and remove last node selection
-let lastId = 0;
-function getNextId() {
-    return ++lastId;
-}
-
 function getSelection() {
     const sel = window.getSelection();
     const el = getActiveNodeElement();
     if (!sel || !el) return;
 
     const range = sel.getRangeAt(0);
-    console.log(range.startContainer.parentElement.dataset.tnode);
-    console.log(range.endContainer.parentElement.dataset.tnode);
-
     const nid = parseInt(el.dataset.tnode);
-    let startPos = sel.anchorOffset;
+
+    let startPos = Math.min(sel.anchorOffset, sel.focusOffset);
+    let endPos = Math.max(sel.anchorOffset, sel.focusOffset);
     let state = "inside";
 
     if (startPos === 0) state = "start";
@@ -205,15 +209,13 @@ function getSelection() {
     }
 
     let text = "";
-    if (!sel.isCollapsed) {
-        text = sel.getRangeAt(0).toString();
-        startPos = Math.min(sel.anchorOffset, sel.focusOffset);
-    }
+    if (!sel.isCollapsed) text = range.toString();
 
     return {
         el,
         nid,
         startPos,
+        endPos,
         state,
         text,
         isCollapsed: sel.isCollapsed,
@@ -292,11 +294,6 @@ function setCursorInNode(nid, position = "end") {
     range.setEnd(child, pos);
     sel.removeAllRanges();
     sel.addRange(range);
-}
-
-function getLastNodeId() {
-    const paragraphs = document.querySelectorAll(".tinymde-paragraph");
-    return paragraphs.length;
 }
 
 // TODO: generalize to any paragraph markdown
