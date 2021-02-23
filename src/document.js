@@ -95,11 +95,11 @@ const Document = {
             if (info.state === "start") {
                 // add empty paragraph above
                 const nextNid = nid == 0 ? 1 : nid;
-                insertNode.call(this, nextNid, "new-line", {}, "", "<br>");
+                insertNode.call(this, nextNid, "new-line", {}, "");
                 positionCursorAt = "start";
             } else if (info.state === "end") {
                 // add empty paragraph below
-                insertNode.call(this, nid + 1, "new-line", {}, "", "<br>");
+                insertNode.call(this, nid + 1, "new-line", {}, "");
             } else {
                 // add paragraph below with content from the selection until the end
                 const node = this.root[info.startNode];
@@ -109,13 +109,23 @@ const Document = {
             }
         } else {
             if (info.startNode === info.endNode) {
-                // add paragraph below, remove selected text (signle node)
+                // add paragraph below, remove selected text in a single node
                 const node = this.root[info.startNode];
                 const first = node.text.substr(0, info.startPos);
                 const second = node.text.substr(info.endPos);
                 split.call(this, first, second);
             } else {
-                // add paragraph below, remove selected text (mutliple nodes)
+                // add paragraph below, remove selected text on multiple nodes
+                const firstNode = this.root[info.startNode];
+                firstNode.text = firstNode.text.substr(0, info.startPos);
+                generateHTML.call(this, info.startNode);
+
+                const secondNode = this.root[info.endNode];
+                secondNode.text = secondNode.text.substr(info.endPos);
+                generateHTML.call(this, info.endNode);
+
+                nid = removeNode.call(this, info.startNode, info.endNode);
+                positionCursorAt = "start";
             }
         }
 
@@ -137,16 +147,6 @@ const Document = {
 
         this.render();
         setCursorInNode(nid + 1, positionCursorAt);
-
-        /*
-            // split the paragraph and remove selection
-            const first = info.el.innerText.substr(0, info.startPos);
-            const second = info.el.innerText.substr(
-                info.startPos + info.text.length
-            );
-            split.call(this, first, second);
-        }
-        */
     },
 
     render: function () {
@@ -257,6 +257,7 @@ function insertNode(nid, type, metadata = {}, text = "") {
     for (let i = 1; i < nid; ++i) {
         newRoot[i] = this.root[i];
     }
+    // TODO: add create node function
     newRoot[nid] = {
         type,
         metadata,
@@ -270,9 +271,27 @@ function insertNode(nid, type, metadata = {}, text = "") {
     generateHTML.call(this, nid);
 }
 
+function removeNode(fromNid, toNid) {
+    const removedNodes = toNid - fromNid - 1;
+    const newRoot = {};
+    let idx = 1;
+    for (; idx <= fromNid; ++idx) {
+        newRoot[idx] = this.root[idx];
+    }
+    const len = Object.keys(this.root).length;
+    for (let i = toNid; i <= len; ++i) {
+        newRoot[idx++] = this.root[i];
+    }
+    this.root = newRoot;
+    return toNid - removedNodes - 1;
+}
+
 function generateHTML(nid) {
     let base = `$1`;
     const node = this.root[nid];
+
+    // TODO: temporary node processing
+    node.type = getNodeType(node.text).type;
 
     if (node.type === "text") {
         base = base.replace(/\$1/g, node.text);
