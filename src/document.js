@@ -116,15 +116,17 @@ const Document = {
                 split.call(this, first, second);
             } else {
                 // add paragraph below, remove selected text on multiple nodes
-                const firstNode = this.root[info.startNode];
+                let start = info.startNode;
+                const firstNode = this.root[start];
                 firstNode.text = firstNode.text.substr(0, info.startPos);
-                generateHTML.call(this, info.startNode);
+                generateHTML.call(this, start);
 
-                const secondNode = this.root[info.endNode];
+                let end = info.endNode;
+                const secondNode = this.root[end];
                 secondNode.text = secondNode.text.substr(info.endPos);
-                generateHTML.call(this, info.endNode);
+                generateHTML.call(this, end);
 
-                nid = removeNode.call(this, info.startNode, info.endNode);
+                nid = removeNode.call(this, start, end);
                 positionCursorAt = "start";
             }
         }
@@ -197,11 +199,10 @@ function getSelection() {
         if (el.innerHTML === "<br>" || !el.innerText.length) {
             state = "end";
         }
-        console.log(state);
     }
 
-    const startNode = parseInt(getNodeIdFromElement(sel.anchorNode));
-    const endNode = parseInt(getNodeIdFromElement(sel.focusNode));
+    const startNode = parseInt(getNodeIdFromElement(range.startContainer));
+    const endNode = parseInt(getNodeIdFromElement(range.endContainer));
 
     return {
         cursorPos,
