@@ -88,27 +88,57 @@ const Document = {
     create: function () {
         // TODO: handle multiple node selection
         const info = getSelection();
-        let nid = info.nid;
-        let pos = "end";
+        let positionCursorAt = "end";
+        let nid = info.startNode;
 
         if (info.isCollapsed) {
             if (info.state === "start") {
                 // add empty paragraph above
                 const nextNid = nid == 0 ? 1 : nid;
                 insertNode.call(this, nextNid, "new-line", {}, "", "<br>");
-                pos = "start";
-            }
-            if (info.state === "end") {
+                positionCursorAt = "start";
+            } else if (info.state === "end") {
                 // add empty paragraph below
                 insertNode.call(this, nid + 1, "new-line", {}, "", "<br>");
-            }
-            if (info.state === "inside") {
-                // add paragraph below with content from middle
-                const first = info.el.innerText.substr(0, info.startPos);
-                const second = info.el.innerText.substr(info.startPos);
+            } else {
+                // add paragraph below with content from the selection until the end
+                const node = this.root[info.startNode];
+                const first = node.text.substr(0, info.cursorPos);
+                const second = node.text.substr(info.cursorPos);
                 split.call(this, first, second);
             }
         } else {
+            if (info.startNode === info.endNode) {
+                // add paragraph below, remove selected text (signle node)
+                const node = this.root[info.startNode];
+                const first = node.text.substr(0, info.startPos);
+                const second = node.text.substr(info.endPos);
+                split.call(this, first, second);
+            } else {
+                // add paragraph below, remove selected text (mutliple nodes)
+            }
+        }
+
+        function split(first, second) {
+            if (!first.length) {
+                this.root[nid].text = "";
+                this.root[nid].type = "new-line";
+            } else {
+                this.root[nid].text = first;
+            }
+            generateHTML.call(this, nid);
+            if (!second.length) {
+                insertNode.call(this, nid + 1, "new-line", {}, "");
+            } else {
+                insertNode.call(this, nid + 1, "text", {}, second);
+            }
+            positionCursorAt = "start";
+        }
+
+        this.render();
+        setCursorInNode(nid + 1, positionCursorAt);
+
+        /*
             // split the paragraph and remove selection
             const first = info.el.innerText.substr(0, info.startPos);
             const second = info.el.innerText.substr(
@@ -116,32 +146,13 @@ const Document = {
             );
             split.call(this, first, second);
         }
-
-        function split(first, second) {
-            if (!first.length) {
-                this.root[nid].text = "";
-                this.root[nid].html = "<br>";
-                this.root[nid].type = "new-line";
-            } else {
-                this.root[nid].text = first;
-                this.root[nid].html = first; // TODO: process tokens
-            }
-            if (!second.length) {
-                insertNode.call(this, nid + 1, "new-line", {}, "", "<br>");
-            } else {
-                insertNode.call(this, nid + 1, "text", {}, second, second);
-            }
-            pos = "start";
-        }
-
-        this.render();
-        setCursorInNode(nid + 1, pos);
+        */
     },
 
     render: function () {
         let output = "";
-        Object.keys(this.root).forEach((nodeId) => {
-            output += this.root[nodeId].html;
+        Object.keys(this.root).forEach((nid) => {
+            output += `<div class="tinymde-paragraph" data-tnode="${nid}">${this.root[nid].html}</div>`;
         });
         this.editor.innerHTML = output;
     },
@@ -170,32 +181,36 @@ const Document = {
 function getSelection() {
     const sel = window.getSelection();
     const el = getActiveNodeElement();
+
     if (!sel || !el) return;
 
     const range = sel.getRangeAt(0);
-    const nid = parseInt(el.dataset.tnode);
-
-    let startPos = Math.min(sel.anchorOffset, sel.focusOffset);
-    let endPos = Math.max(sel.anchorOffset, sel.focusOffset);
+    const isCollapsed = sel.isCollapsed;
+    let cursorPos = Cursor.getCurrentCursorPosition(el);
+    let startPos = range.startOffset;
+    let endPos = range.endOffset;
     let state = "inside";
 
-    if (startPos === 0) state = "start";
-    if (startPos === el.innerText.length) state = "end";
-    if (el.innerHTML === "<br>" || !el.innerText.length) {
-        state = "end";
+    if (isCollapsed) {
+        if (startPos === 0) state = "start";
+        if (startPos === el.innerText.length) state = "end";
+        if (el.innerHTML === "<br>" || !el.innerText.length) {
+            state = "end";
+        }
+        console.log(state);
     }
 
-    let text = "";
-    if (!sel.isCollapsed) text = range.toString();
+    const startNode = parseInt(getNodeIdFromElement(sel.anchorNode));
+    const endNode = parseInt(getNodeIdFromElement(sel.focusNode));
 
     return {
-        el,
-        nid,
-        startPos,
+        cursorPos,
+        endNode,
         endPos,
+        isCollapsed,
+        startNode,
+        startPos,
         state,
-        text,
-        isCollapsed: sel.isCollapsed,
     };
 }
 
@@ -230,7 +245,14 @@ function getNodeType(para) {
     return { type: "text", metadata: {} };
 }
 
-function insertNode(nid, type, metadata = {}, text = "", html = "") {
+function getNodeIdFromElement(el) {
+    while (el && !el.classList?.contains("tinymde-paragraph")) {
+        el = el.parentElement;
+    }
+    return el ? el.dataset.tnode : -1;
+}
+
+function insertNode(nid, type, metadata = {}, text = "") {
     const newRoot = {};
     for (let i = 1; i < nid; ++i) {
         newRoot[i] = this.root[i];
@@ -239,16 +261,17 @@ function insertNode(nid, type, metadata = {}, text = "", html = "") {
         type,
         metadata,
         text,
-        html,
+        html: "",
     };
     for (let i = nid; i <= Object.keys(this.root).length; ++i) {
         newRoot[i + 1] = this.root[i];
     }
     this.root = newRoot;
+    generateHTML.call(this, nid);
 }
 
 function generateHTML(nid) {
-    let base = `<div class="tinymde-paragraph" data-tnode="${nid}">$1</div>`;
+    let base = `$1`;
     const node = this.root[nid];
 
     if (node.type === "text") {
