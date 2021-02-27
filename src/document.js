@@ -14,8 +14,8 @@ const Document = {
     },
 
     /**
-     * Build the entire document, render it, and set cursor at the end.
-     * This function should be used when the content is being reset dynamically.
+     * Build the document model, render it, and set cursor at the end.
+     * This function should be used when the content is being set dynamically.
      * @param {string} content
      */
     reset: function (content) {
@@ -37,6 +37,70 @@ const Document = {
                 setCursorInNode(this.lastNode);
             });
         }
+    },
+
+    /**
+     * Insert a new paragraph into the document model.
+     * This function should be called on carriage return (enter key press).
+     */
+    insertParagraph: function () {
+        const info = getSelection();
+        let positionCursorAt = "end";
+        let nid = info.startNode;
+
+        if (info.isCollapsed) {
+            if (info.state === "start") {
+                // add empty paragraph above
+                const nextNid = nid == 0 ? 1 : nid;
+                insertNode.call(this, nextNid, "new-line", {}, "");
+                positionCursorAt = "start";
+            } else if (info.state === "end") {
+                // add empty paragraph below
+                insertNode.call(this, nid + 1, "new-line", {}, "");
+            } else {
+                // add paragraph below with content from the selection until the end
+                const node = this.root[info.startNode];
+                const first = node.text.substr(0, info.startPos);
+                const second = node.text.substr(info.startPos);
+                split.call(this, first, second);
+            }
+        } else {
+            if (info.startNode === info.endNode) {
+                // add paragraph below, remove selected text in a single node
+                const node = this.root[info.startNode];
+                const first = node.text.substr(0, info.startPos);
+                const second = node.text.substr(info.endPos);
+                split.call(this, first, second);
+            } else {
+                // add paragraph below, remove selected text on multiple nodes
+                let start = info.startNode;
+                const firstNode = this.root[start];
+                firstNode.text = firstNode.text.substr(0, info.startOffset);
+                generateHTML.call(this, start);
+
+                const end = info.endNode;
+                const secondNode = this.root[end];
+                secondNode.text = secondNode.text.substr(info.endOffset);
+                generateHTML.call(this, end);
+
+                nid = removeNode.call(this, start, end);
+                positionCursorAt = "start";
+            }
+        }
+
+        function split(first, second) {
+            const firstType = first.length ? this.root[nid].type : "new-line";
+            this.root[nid].text = first;
+            this.root[nid].type = firstType;
+            generateHTML.call(this, nid);
+
+            const secondType = second.length ? "text" : "new-line";
+            insertNode.call(this, nid + 1, secondType, {}, second);
+            positionCursorAt = "start";
+        }
+
+        this.render();
+        setCursorInNode(nid + 1, positionCursorAt);
     },
 
     update: function () {
@@ -63,7 +127,7 @@ const Document = {
             node.text = el.innerText;
             node.html = el.innerHTML;
 
-            let dirty = false;
+            let dirty = true;
 
             // test for paragraph type changes
             if (node.type !== type) {
@@ -74,92 +138,16 @@ const Document = {
             }
 
             // TODO: test for markup changes
-
             if (dirty) {
                 // update required
+                generateHTML.call(this, nid);
                 el.innerHTML = node.html;
-                setTimeout(() => {
-                    Cursor.setCurrentCursorPosition(cursorPos, el);
-                });
+                Cursor.setCurrentCursorPosition(cursorPos, el);
             }
         });
     },
 
-    create: function () {
-        // TODO: handle multiple node selection
-        const info = getSelection();
-        let positionCursorAt = "end";
-        let nid = info.startNode;
-
-        if (info.isCollapsed) {
-            if (info.state === "start") {
-                // add empty paragraph above
-                const nextNid = nid == 0 ? 1 : nid;
-                insertNode.call(this, nextNid, "new-line", {}, "");
-                positionCursorAt = "start";
-            } else if (info.state === "end") {
-                // add empty paragraph below
-                insertNode.call(this, nid + 1, "new-line", {}, "");
-            } else {
-                // add paragraph below with content from the selection until the end
-                const node = this.root[info.startNode];
-                const first = node.text.substr(0, info.cursorPos);
-                const second = node.text.substr(info.cursorPos);
-                split.call(this, first, second);
-            }
-        } else {
-            if (info.startNode === info.endNode) {
-                // add paragraph below, remove selected text in a single node
-                const node = this.root[info.startNode];
-                const first = node.text.substr(0, info.startPos);
-                const second = node.text.substr(info.endPos);
-                split.call(this, first, second);
-            } else {
-                // add paragraph below, remove selected text on multiple nodes
-                let start = info.startNode;
-                const firstNode = this.root[start];
-                firstNode.text = firstNode.text.substr(0, info.startPos);
-                generateHTML.call(this, start);
-
-                let end = info.endNode;
-                const secondNode = this.root[end];
-                secondNode.text = secondNode.text.substr(info.endPos);
-                generateHTML.call(this, end);
-
-                nid = removeNode.call(this, start, end);
-                positionCursorAt = "start";
-            }
-        }
-
-        function split(first, second) {
-            if (!first.length) {
-                this.root[nid].text = "";
-                this.root[nid].type = "new-line";
-            } else {
-                this.root[nid].text = first;
-            }
-            generateHTML.call(this, nid);
-            if (!second.length) {
-                insertNode.call(this, nid + 1, "new-line", {}, "");
-            } else {
-                insertNode.call(this, nid + 1, "text", {}, second);
-            }
-            positionCursorAt = "start";
-        }
-
-        this.render();
-        setCursorInNode(nid + 1, positionCursorAt);
-    },
-
-    render: function () {
-        let output = "";
-        Object.keys(this.root).forEach((nid) => {
-            output += `<div class="tinymde-paragraph" data-tnode="${nid}">${this.root[nid].html}</div>`;
-        });
-        this.editor.innerHTML = output;
-    },
-
-    delete: function () {
+    removeParagraph: function () {
         const el = getActiveNodeElement();
         // TODO: fix delete on selection
         if (el.innerHTML === "<br>" || !el.innerHTML.length) {
@@ -178,6 +166,14 @@ const Document = {
         }
         return false;
     },
+
+    render: function () {
+        let output = "";
+        Object.keys(this.root).forEach((nid) => {
+            output += `<div class="tinymde-paragraph" data-tnode="${nid}">${this.root[nid].html}</div>`;
+        });
+        this.editor.innerHTML = output;
+    },
 };
 
 function getSelection() {
@@ -188,11 +184,17 @@ function getSelection() {
 
     const range = sel.getRangeAt(0);
     const isCollapsed = sel.isCollapsed;
-    let cursorPos = Cursor.getCurrentCursorPosition(el);
-    let startPos = range.startOffset;
-    let endPos = range.endOffset;
-    let state = "inside";
+    const cursorPos = Cursor.getCurrentCursorPosition(el);
+    const textLen = range.cloneContents().textContent.length;
 
+    let startPos = cursorPos - textLen;
+    let endPos = cursorPos;
+    if (sel.anchorOffset > sel.focusOffset) {
+        startPos = cursorPos;
+        endPos = cursorPos + textLen;
+    }
+
+    let state = "inside";
     if (isCollapsed) {
         if (startPos === 0) state = "start";
         if (startPos === el.innerText.length) state = "end";
@@ -205,11 +207,12 @@ function getSelection() {
     const endNode = parseInt(getNodeIdFromElement(range.endContainer));
 
     return {
-        cursorPos,
         endNode,
+        endOffset: range.endOffset,
         endPos,
         isCollapsed,
         startNode,
+        startOffset: range.startOffset,
         startPos,
         state,
     };
@@ -310,6 +313,14 @@ function generateHTML(nid) {
     }
 
     node.html = base;
+
+    const regex = {
+        bold: /(\*{2,3})(.+?)(\1)/gm,
+        italic: /(?<=(\*\*|\s|^))\*{1}([^\*].+?)(\*{1})(?=(\*\*|\s|$))/gm,
+    };
+
+    node.html = node.html.replace(regex.bold, "<strong>$&</strong>");
+    node.html = node.html.replace(regex.italic, "<em>$&</em>");
 }
 
 function setCursorInNode(nid, position = "end") {
@@ -336,13 +347,6 @@ function setCursorInNode(nid, position = "end") {
     range.setEnd(child, pos);
     sel.removeAllRanges();
     sel.addRange(range);
-}
-
-// TODO: generalize to any paragraph markdown
-function setHeaderMarkup(content, len) {
-    content = content.substr(len + 1);
-    const gutter = "#".repeat(len) + " ";
-    return `<strong><span class="gutter">${gutter}</span>${content}</strong>`;
 }
 
 export default Document;

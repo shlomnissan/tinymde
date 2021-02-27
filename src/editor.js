@@ -37,12 +37,12 @@ const Editor = {
         this.editor.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 event.preventDefault();
-                Document.create();
+                Document.insertParagraph();
                 return;
             }
 
             if (event.key === "Backspace") {
-                if (Document.delete()) {
+                if (Document.removeParagraph()) {
                     event.preventDefault();
                     return;
                 }
