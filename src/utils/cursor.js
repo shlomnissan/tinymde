@@ -4,7 +4,7 @@ const Cursor = {
             charCount = -1,
             node;
 
-        if (selection.focusNode) {
+        if (selection.anchorNode) {
             if (isChildOf(selection.focusNode, parentElement)) {
                 node = selection.focusNode;
                 charCount = selection.focusOffset;

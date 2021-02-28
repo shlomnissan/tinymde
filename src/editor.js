@@ -48,7 +48,6 @@ const Editor = {
                 }
             }
 
-            if (event.key.length !== 1 && event.key !== "Backspace") return;
             Document.update();
         });
 

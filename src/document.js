@@ -119,7 +119,8 @@ const Document = {
             const nid = el.dataset.tnode;
             const node = this.root[nid];
 
-            if (node.text === el.text) return; // no modifications
+            if (node.text === el.innerText || node.html === el.innerHTML)
+                return; // no modifications
 
             const cursorPos = Cursor.getCurrentCursorPosition(el);
             const { type, metadata } = getNodeType(el.innerText);
@@ -148,23 +149,54 @@ const Document = {
     },
 
     removeParagraph: function () {
-        const el = getActiveNodeElement();
-        // TODO: fix delete on selection
-        if (el.innerHTML === "<br>" || !el.innerHTML.length) {
-            const nid = parseInt(el.dataset.tnode);
-            const newRoot = {};
-            for (let i = 1; i < nid; ++i) {
-                newRoot[i] = this.root[i];
+        const info = getSelection();
+
+        let cursorOffset = 0;
+        let cursorNode = info.startNode;
+
+        const isMultiNode = info.startNode !== info.endNode;
+        if (!isMultiNode) {
+            if (info.startPos !== 0 || !info.isCollapsed) {
+                return false;
             }
-            for (let i = nid + 1; i <= Object.keys(this.root).length; ++i) {
-                newRoot[i - 1] = this.root[i];
-            }
-            this.root = newRoot;
-            this.render();
-            setCursorInNode(nid - 1);
-            return true;
         }
-        return false;
+
+        if (!isMultiNode) {
+            const node = this.root[info.startNode];
+            const prevNode = this.root[info.startNode - 1];
+            cursorOffset = prevNode.text.length;
+            if (node.type !== "new-line") {
+                if (info.startNode === 1) return true;
+                // copy current paragraph content to the one above
+                prevNode.text += node.text;
+                generateHTML.call(this, info.startNode - 1);
+            }
+            removeNode.call(this, info.startNode - 1, info.startNode + 1);
+            cursorNode = info.startNode - 1;
+        } else {
+            const range = window.getSelection().getRangeAt(0);
+            range.deleteContents();
+
+            const { startNode, endNode } = info;
+            const startContainer = getNodeElement(startNode);
+            const endContainer = getNodeElement(endNode);
+
+            cursorOffset = startContainer.innerText.length;
+
+            this.root[startNode].text =
+                startContainer.innerText + endContainer.innerText;
+            generateHTML.call(this, info.startNode);
+
+            removeNode.call(this, startNode, endNode + 1);
+        }
+
+        this.render();
+        Cursor.setCurrentCursorPosition(
+            cursorOffset,
+            getNodeElement(cursorNode)
+        );
+
+        return true;
     },
 
     render: function () {
@@ -184,6 +216,8 @@ function getSelection() {
 
     const range = sel.getRangeAt(0);
     const isCollapsed = sel.isCollapsed;
+    const startNode = parseInt(getNodeIdFromElement(range.startContainer));
+    const endNode = parseInt(getNodeIdFromElement(range.endContainer));
     const cursorPos = Cursor.getCurrentCursorPosition(el);
     const textLen = range.cloneContents().textContent.length;
 
@@ -194,6 +228,7 @@ function getSelection() {
         endPos = cursorPos + textLen;
     }
 
+    // TODO: clean up the state
     let state = "inside";
     if (isCollapsed) {
         if (startPos === 0) state = "start";
@@ -202,9 +237,6 @@ function getSelection() {
             state = "end";
         }
     }
-
-    const startNode = parseInt(getNodeIdFromElement(range.startContainer));
-    const endNode = parseInt(getNodeIdFromElement(range.endContainer));
 
     return {
         endNode,
@@ -232,8 +264,10 @@ function getActiveNodeElement() {
 
 function getNodeElement(nid) {
     const paragraphs = document.querySelectorAll(".tinymde-paragraph");
-    if (paragraphs.length >= nid) {
-        return paragraphs[nid - 1];
+    for (let i = 0; i < paragraphs.length; ++i) {
+        if (paragraphs[i].dataset.tnode == nid) {
+            return paragraphs[i];
+        }
     }
     return null;
 }
