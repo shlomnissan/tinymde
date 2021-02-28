@@ -2,7 +2,6 @@ import { getTextState, getParagraph } from "./utils/edit";
 
 import Shortcut, { initializeShortcuts } from "./shortcut";
 import Commands from "./commands/commands";
-import Cursor from "./utils/cursor";
 import Document from "./document";
 
 const Editor = {

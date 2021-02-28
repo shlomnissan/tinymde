@@ -34,7 +34,10 @@ const Document = {
         });
         if (paragraphs.length) {
             setTimeout(() => {
-                setCursorInNode(this.lastNode);
+                Cursor.setCurrentCursorPosition(
+                    this.root[this.lastNode].text.length,
+                    getNodeElement(this.lastNode)
+                );
             });
         }
     },
@@ -45,15 +48,13 @@ const Document = {
      */
     insertParagraph: function () {
         const info = getSelection();
-        let positionCursorAt = "end";
-        let nid = info.startNode;
+        const nid = info.startNode;
 
         if (info.isCollapsed) {
             if (info.state === "start") {
                 // add empty paragraph above
                 const nextNid = nid == 0 ? 1 : nid;
                 insertNode.call(this, nextNid, "new-line", {}, "");
-                positionCursorAt = "start";
             } else if (info.state === "end") {
                 // add empty paragraph below
                 insertNode.call(this, nid + 1, "new-line", {}, "");
@@ -73,18 +74,18 @@ const Document = {
                 split.call(this, first, second);
             } else {
                 // add paragraph below, remove selected text on multiple nodes
-                let start = info.startNode;
-                const firstNode = this.root[start];
-                firstNode.text = firstNode.text.substr(0, info.startOffset);
-                generateHTML.call(this, start);
+                const range = window.getSelection().getRangeAt(0);
+                range.deleteContents();
 
-                const end = info.endNode;
-                const secondNode = this.root[end];
-                secondNode.text = secondNode.text.substr(info.endOffset);
-                generateHTML.call(this, end);
+                const startContainer = getNodeElement(info.startNode);
+                this.root[info.startNode].text = startContainer.innerText;
+                generateHTML.call(this, info.startNode);
 
-                nid = removeNode.call(this, start, end);
-                positionCursorAt = "start";
+                const endContainer = getNodeElement(info.endNode);
+                this.root[info.endNode].text = endContainer.innerText;
+                generateHTML.call(this, info.endNode);
+
+                removeNode.call(this, info.startNode, info.endNode);
             }
         }
 
@@ -96,11 +97,10 @@ const Document = {
 
             const secondType = second.length ? "text" : "new-line";
             insertNode.call(this, nid + 1, secondType, {}, second);
-            positionCursorAt = "start";
         }
 
         this.render();
-        setCursorInNode(nid + 1, positionCursorAt);
+        Cursor.setCurrentCursorPosition(0, getNodeElement(nid + 1));
     },
 
     update: function () {
@@ -148,6 +148,10 @@ const Document = {
         });
     },
 
+    /**
+     * Remove paragraph from the document model if needed.
+     * This function should be called on backspace (delete key press).
+     */
     removeParagraph: function () {
         const info = getSelection();
 
@@ -228,7 +232,7 @@ function getSelection() {
         endPos = cursorPos + textLen;
     }
 
-    // TODO: clean up the state
+    // TODO: remove state
     let state = "inside";
     if (isCollapsed) {
         if (startPos === 0) state = "start";
@@ -355,32 +359,6 @@ function generateHTML(nid) {
 
     node.html = node.html.replace(regex.bold, "<strong>$&</strong>");
     node.html = node.html.replace(regex.italic, "<em>$&</em>");
-}
-
-function setCursorInNode(nid, position = "end") {
-    const el = getNodeElement(nid);
-
-    if (!el) return;
-
-    const range = new Range();
-    const sel = window.getSelection();
-
-    let child = el;
-    if (position === "end") {
-        while (child.lastChild) {
-            child = child.lastChild;
-        }
-    } else {
-        while (child.firstChild) {
-            child = child.firstChild;
-        }
-    }
-
-    const pos = position === "end" ? child.length : 0;
-    range.setStart(child, pos);
-    range.setEnd(child, pos);
-    sel.removeAllRanges();
-    sel.addRange(range);
 }
 
 export default Document;
