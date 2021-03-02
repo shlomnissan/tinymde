@@ -20,16 +20,18 @@ const Document = {
      */
     reset: function (content) {
         this.root = {};
-        const paragraphs = content.split("\n");
+        const paragraphs = content.split(/\n/gm);
         paragraphs.forEach((para) => {
             const nid = ++this.lastNode;
             const { type, metadata } = getNodeType(para);
+            // TODO: call create node
             this.root[nid] = {
                 type,
                 metadata,
                 text: para,
                 html: para,
             };
+            // TODO: update node
             generateHTML.call(this, nid);
         });
         if (paragraphs.length) {
@@ -49,13 +51,14 @@ const Document = {
     insertParagraph: function () {
         const info = getSelection();
         const nid = info.startNode;
+        const node = this.root[nid];
 
         if (info.isCollapsed) {
-            if (info.state === "start") {
+            if (info.startOffset === 0) {
                 // add empty paragraph above
                 const nextNid = nid == 0 ? 1 : nid;
                 insertNode.call(this, nextNid, "new-line", {}, "");
-            } else if (info.state === "end") {
+            } else if (info.startPos === node.text.length) {
                 // add empty paragraph below
                 insertNode.call(this, nid + 1, "new-line", {}, "");
             } else {
@@ -68,7 +71,6 @@ const Document = {
         } else {
             if (info.startNode === info.endNode) {
                 // add paragraph below, remove selected text in a single node
-                const node = this.root[info.startNode];
                 const first = node.text.substr(0, info.startPos);
                 const second = node.text.substr(info.endPos);
                 split.call(this, first, second);
@@ -178,6 +180,8 @@ const Document = {
             removeNode.call(this, info.startNode - 1, info.startNode + 1);
             cursorNode = info.startNode - 1;
         } else {
+            // handle multi-node selection. merge start/end nodes
+            // and remove everything in-between
             const range = window.getSelection().getRangeAt(0);
             range.deleteContents();
 
@@ -232,16 +236,6 @@ function getSelection() {
         endPos = cursorPos + textLen;
     }
 
-    // TODO: remove state
-    let state = "inside";
-    if (isCollapsed) {
-        if (startPos === 0) state = "start";
-        if (startPos === el.innerText.length) state = "end";
-        if (el.innerHTML === "<br>" || !el.innerText.length) {
-            state = "end";
-        }
-    }
-
     return {
         endNode,
         endOffset: range.endOffset,
@@ -250,7 +244,6 @@ function getSelection() {
         startNode,
         startOffset: range.startOffset,
         startPos,
-        state,
     };
 }
 
