@@ -1,4 +1,4 @@
-import { getTextState, getParagraph } from "./utils/edit";
+import { getTextState } from "./utils/edit";
 
 import Shortcut, { initializeShortcuts } from "./shortcut";
 import Commands from "./commands/commands";
@@ -47,7 +47,7 @@ const Editor = {
                 }
             }
 
-            Document.update();
+            Document.update(event.key);
         });
 
         this.editor.focus();

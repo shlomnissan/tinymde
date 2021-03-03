@@ -89,7 +89,12 @@ const Document = {
         Cursor.setCurrentCursorPosition(0, getElementWithNid(nid + 1));
     },
 
-    update: function () {
+    /**
+     * Updates the current node and the HTML element if needed.
+     * This function is called on every key press that isn't a document modifier.
+     * @param {string} key
+     */
+    update: function (key = "") {
         if (this.editor.innerText.length === 0) {
             // the editor is empty, reset virtual dom
             setTimeout(() => {
@@ -99,35 +104,31 @@ const Document = {
             return;
         }
 
-        setTimeout(() => {
-            // TODO: use get selection
-            const el = getElementFromSelection();
-            const nid = el.dataset.tnode;
-            const node = this.root[nid];
+        const info = getSelection();
+        const node = this.root[info.startNode];
+        const el = getElementWithNid(info.startNode);
 
-            if (node.text === el.innerText || node.html === el.innerHTML)
-                return; // no modifications
-
+        const triggerUpdate = () => {
+            // HTML structure changed, trigger re-render
             const cursorPos = Cursor.getCurrentCursorPosition(el);
-            const { type, metadata } = getNodeType(el.innerText);
+            el.innerHTML = node.html;
+            Cursor.setCurrentCursorPosition(cursorPos, el);
+        };
 
-            node.text = el.innerText;
-            node.html = el.innerHTML;
+        setTimeout(() => {
+            updateNode(node, el.innerText);
 
-            let dirty = true;
-
-            // test for paragraph type changes
-            if (node.type !== type) {
-                dirty = true;
-                updateNode(this.root[nid], this.root[nid].text);
+            // if space key, re-render the node
+            if (key === " ") {
+                triggerUpdate();
+                return;
             }
 
-            // TODO: test for markup changes
-            if (dirty) {
-                // update required
-                updateNode(this.root[nid], this.root[nid].text);
-                el.innerHTML = node.html;
-                Cursor.setCurrentCursorPosition(cursorPos, el);
+            // if children element count changed, re-render the node
+            const newEl = document.createElement("div");
+            newEl.innerHTML = node.html;
+            if (newEl.childElementCount !== el.childElementCount) {
+                triggerUpdate();
             }
         });
     },
@@ -192,6 +193,9 @@ const Document = {
         return true;
     },
 
+    /**
+     * Renders the document model and assigns it to the render target.
+     */
     render: function () {
         let output = "";
         Object.keys(this.root).forEach((nid) => {
