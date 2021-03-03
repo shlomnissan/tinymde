@@ -66,6 +66,7 @@ const Editor = {
             case "italic":
                 break;
             case "header":
+                Commands.Header.execute(value);
                 break;
             case "unordered-list":
                 break;

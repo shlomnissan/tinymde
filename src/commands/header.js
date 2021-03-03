@@ -1,46 +1,37 @@
-import {
-    selectContents,
-    stripParagraphMarkdown,
-    getParagraph,
-} from "../utils/edit";
+import { stripParagraphMarkdown, selectContentInElement } from "../utils/text";
+import { getActiveParagraph } from "../document";
 import Cursor from "../utils/cursor";
 import insertText from "../utils/text";
 
 const Header = {
     regex: /^(\#{1,6}\s)(.*)/g,
     execute(size) {
-        const node = getParagraph();
-        if (!node) return;
+        const para = getActiveParagraph();
+        if (!para) return;
 
         let offset = size + 1;
-        let text = node.innerText;
-
+        let text = para.innerText;
         const regex = new RegExp(`^(\\#{${size}}\\s)(.*?)`, "g");
 
         const addMarkdown = () => {
             const stripped = stripParagraphMarkdown(text);
             text = `${"#".repeat(size)} ${stripped.text}`;
-            insertText(node, text);
+            insertText(para, text);
             offset = pos + offset - stripped.offset;
         };
 
         const stripMarkdown = () => {
             text = text.substring(offset, text.length);
-            insertText(node, text);
+            insertText(para, text);
             offset = pos - offset;
         };
 
-        // Get the cursor's position, relative to the paragraph
-        const pos = Cursor.getCurrentCursorPosition(node);
+        const pos = Cursor.getCurrentCursorPosition(para);
+        selectContentInElement(para);
 
-        // Select the content
-        selectContents(node, 0);
-
-        const isMarkdown = node.innerText.match(regex);
-        isMarkdown ? stripMarkdown() : addMarkdown();
-
-        // Set the cursor's position, relative to the paragraph
-        Cursor.setCurrentCursorPosition(offset, node);
+        const match = text.match(regex);
+        match ? stripMarkdown() : addMarkdown();
+        Cursor.setCurrentCursorPosition(offset, para);
     },
 };
 

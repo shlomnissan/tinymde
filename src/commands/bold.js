@@ -2,7 +2,7 @@ import {
     selectContentInActiveRange,
     getSurroundingWord,
     getContainerFromActiveRange,
-} from "../utils/edit";
+} from "../utils/text";
 import Cursor from "../utils/cursor";
 import insertText from "../utils/text";
 

@@ -208,7 +208,7 @@ const Document = {
 
 function getSelection() {
     const sel = window.getSelection();
-    const el = getElementFromSelection();
+    const el = getActiveParagraph();
 
     if (!sel || !el) return;
 
@@ -237,7 +237,7 @@ function getSelection() {
     };
 }
 
-function getElementFromSelection() {
+export function getActiveParagraph() {
     let container = window.getSelection().anchorNode;
     while (container.nodeType === Node.TEXT_NODE) {
         container = container.parentElement;
