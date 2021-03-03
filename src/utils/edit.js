@@ -2,7 +2,7 @@
  * Returns the currently active range.
  * @return {Range}
  */
-export function getActiveRange() {
+function getActiveRange() {
     if (!document.getSelection) {
         console.error("TinyMDE: documnt.getSelection() isn't supported.");
         return;
@@ -41,31 +41,10 @@ export function getSurroundingWord(text, position) {
     return { start, end };
 }
 
-export function getSelectionRange() {
-    const sel = window.getSelection();
-    return {
-        start: Math.min(sel.anchorOffset, sel.focusOffset),
-        end: Math.max(sel.anchorOffset, sel.focusOffset),
-    };
-}
-
 /**
- * Returns the text and cursor's position.
- * @param {HTMLDivElement} editor - contentEditable div tag.
- * @return {Object} - {text: string, position: number}.
+ * @keep
  */
-export function getTextState(editor) {
-    editor.focus();
-    const range = getActiveRange();
-    if (!range) return;
-    const wholeText = range.startContainer?.wholeText || "";
-    return {
-        text: wholeText,
-        position: range.startOffset,
-    };
-}
-
-function getContainerFromActiveRange() {
+export function getContainerFromActiveRange() {
     const range = getActiveRange();
     if (!range) return null;
 
@@ -77,19 +56,10 @@ function getContainerFromActiveRange() {
         : range.startContainer.firstChild;
 }
 
-export function setCursorInActiveRange(offset) {
-    const container = getContainerFromActiveRange();
-    if (!container) return;
-
-    const range = getActiveRange();
-
-    if (offset < 0 || offset > container.length) return;
-
-    range.setStart(container, offset);
-    range.setEnd(container, offset);
-}
-
-export function getContentsInActiveRange({ start, end }) {
+/**
+ * @keep
+ */
+export function selectContentInActiveRange({ start, end }) {
     const container = getContainerFromActiveRange();
     if (!container) return;
 
@@ -101,6 +71,9 @@ export function getContentsInActiveRange({ start, end }) {
     return range.cloneContents().textContent;
 }
 
+/**
+ * @deprecated
+ */
 export function getParagraph() {
     let container = window.getSelection().anchorNode.parentElement;
     while (!container.classList.contains("tinymde-paragraph")) {
@@ -110,6 +83,9 @@ export function getParagraph() {
     return container;
 }
 
+/**
+ * @deprecated
+ */
 export function selectContents(element, offset) {
     const sel = window.getSelection();
     const range = new Range();
@@ -125,9 +101,7 @@ export function selectContents(element, offset) {
 }
 
 /**
- * Strips paragraph markdown (headers, blockquote, list)
- * @param {string} text - The paragraph's text
- * @return {Object} - { text: string, offset: number }
+ * @keep
  */
 const regex = new RegExp(`^(\\#{1,6}\\s)|(\\>\\s)(.*?)`, "g");
 export function stripParagraphMarkdown(text) {

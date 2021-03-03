@@ -1,4 +1,5 @@
 import Cursor from "./utils/cursor";
+import Commands from "./commands/commands";
 
 const Document = {
     root: {},
@@ -337,7 +338,7 @@ function processHTML(text, type, metadata) {
     }
 
     const regex = {
-        bold: /(\*{2,3})(.+?)(\1)/g,
+        bold: Commands.Bold.regex,
         italic: /(?<=(\*\*|\s|^))\*{1}([^\*].+?)(\*{1})(?=(\*\*|\s|$))/g,
     };
 

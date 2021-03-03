@@ -1,5 +1,3 @@
-import { getTextState } from "./utils/edit";
-
 import Shortcut, { initializeShortcuts } from "./shortcut";
 import Commands from "./commands/commands";
 import Document from "./document";
@@ -58,17 +56,16 @@ const Editor = {
     },
 
     executeCommand: function (command, value) {
-        const textState = getTextState(this.editor);
+        this.editor.focus();
         switch (command) {
             case "bold":
-                Commands.Bold.execute(textState);
+                Commands.Bold.execute();
                 break;
             case "strikethrough":
                 break;
             case "italic":
                 break;
             case "header":
-                Commands.Header.execute(value);
                 break;
             case "unordered-list":
                 break;
@@ -82,6 +79,7 @@ const Editor = {
                 console.error(`TinyMDE: ${command} is an invalid command.`);
                 break;
         }
+        Document.update(" "); // " " forced update
     },
 };
 
