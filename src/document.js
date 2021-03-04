@@ -29,12 +29,6 @@ const Document = {
         });
         if (paragraphs.length) {
             this.render();
-            setTimeout(() => {
-                Cursor.setCurrentCursorPosition(
-                    this.root[this.lastNode].text.length,
-                    getElementWithNid(this.lastNode)
-                );
-            });
         }
     },
 

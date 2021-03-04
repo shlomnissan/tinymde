@@ -6,7 +6,6 @@ import {
 import Cursor from "../utils/cursor";
 import insertText from "../utils/text";
 
-// TODO: handle an empty command
 // TODO: handle nested italic
 
 const Bold = {
@@ -36,6 +35,16 @@ const Bold = {
             }
 
             insertText(node, `**${selection}**`);
+
+            if (!selection) {
+                // if the selection is empty (not near a word)
+                // place the cursor in the middle
+                Cursor.setCurrentCursorPosition(
+                    cOffset + this.offset,
+                    getContainerFromActiveRange()
+                );
+                return;
+            }
 
             setTimeout(() => {
                 Cursor.setCurrentCursorPosition(
