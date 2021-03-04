@@ -21,12 +21,14 @@ const Document = {
      */
     reset: function (content) {
         this.root = {};
+        this.lastNode = 0;
         const paragraphs = content.split(/\n/gm);
         paragraphs.forEach((para) => {
             const nid = ++this.lastNode;
             this.root[nid] = createNode(para);
         });
         if (paragraphs.length) {
+            this.render();
             setTimeout(() => {
                 Cursor.setCurrentCursorPosition(
                     this.root[this.lastNode].text.length,
@@ -328,6 +330,11 @@ function removeNode(fromNid, toNid) {
 
 function processHTML(text, type, metadata) {
     let str = "";
+
+    // escape HTML tags
+    text = text.replace(/&/g, "&amp;");
+    text = text.replace(/</g, "&lt;");
+    text = text.replace(/>/g, "&gt;");
 
     if (type === "text") str = text;
     if (type === "new-line") str = "<br>";

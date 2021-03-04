@@ -6,6 +6,9 @@ import {
 import Cursor from "../utils/cursor";
 import insertText from "../utils/text";
 
+// TODO: handle an empty command
+// TODO: handle nested italic
+
 const Bold = {
     regex: /(\*{2,3})(.+?)(\1)/g,
     offset: 2,

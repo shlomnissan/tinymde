@@ -34,10 +34,10 @@ const TinyMDE = function (editorSelector, config = {}) {
 
         if (this.config.toggleToolbar) {
             Editor.addEventListener("onkeypress", () => {
-                Toolbar.hideToolbar();
+                Toolbar.hide();
             });
             Editor.addEventListener("onmousemove", () => {
-                Toolbar.showToolbar();
+                Toolbar.show();
             });
         }
 

@@ -107,7 +107,7 @@ function dispatchCallbacks(editor, callbacks) {
 function addShortcuts() {
     Shortcut("Tab", (event) => {
         event.preventDefault();
-        document.execCommand("insertHTML", false, "&#009");
+        document.execCommand("insertHTML", false, "&nbsp".repeat(4));
     });
     Shortcut("ctrl+b", (event) => {
         event.preventDefault();
