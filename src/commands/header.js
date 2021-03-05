@@ -1,7 +1,6 @@
 import { stripParagraphMarkdown, selectContentInElement } from "../utils/text";
-import { getActiveParagraph } from "../document";
+import Document, { getActiveParagraph } from "../document";
 import Cursor from "../utils/cursor";
-import insertText from "../utils/text";
 
 const Header = {
     regex: /^(\#{1,6}\s)(.*)/g,
@@ -16,13 +15,15 @@ const Header = {
         const addMarkdown = () => {
             const stripped = stripParagraphMarkdown(text);
             text = `${"#".repeat(size)} ${stripped.text}`;
-            insertText(para, text);
+            para.innerText = text;
+            Document.update();
             offset = pos + offset - stripped.offset;
         };
 
         const stripMarkdown = () => {
             text = text.substring(offset, text.length);
-            insertText(para, text);
+            para.innerText = text;
+            Document.update();
             offset = pos - offset;
         };
 

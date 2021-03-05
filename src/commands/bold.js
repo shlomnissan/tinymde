@@ -5,6 +5,7 @@ import {
 } from "../utils/text";
 import Cursor from "../utils/cursor";
 import insertText from "../utils/text";
+import Document from "../document";
 
 // TODO: handle nested italic
 
@@ -59,7 +60,7 @@ const Bold = {
                 start: 0,
                 end: node.innerText.length,
             });
-            insertText(node, match[0].replace(this.regex, "$2"));
+            node.innerText = match[0].replace(this.regex, "$2");
             const len = match[0].length;
             const offset = Math.min(cOffset, len - this.offset);
             Cursor.setCurrentCursorPosition(
@@ -70,6 +71,7 @@ const Bold = {
 
         const match = cText.match(this.regex);
         match ? stripMarkdown() : addMarkdown();
+        Document.update();
     },
 };
 

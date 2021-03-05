@@ -32,20 +32,17 @@ const Editor = {
         });
 
         this.editor.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
+            if (event.key === "Enter" || event.key === "Backspace") {
                 event.preventDefault();
-                Document.insertParagraph();
-                return;
+                event.key === "Enter"
+                    ? Document.insertParagraph()
+                    : Document.removeParagraph();
             }
 
-            if (event.key === "Backspace") {
-                if (Document.removeParagraph()) {
-                    event.preventDefault();
-                    return;
-                }
+            if (String.fromCharCode(event.keyCode).match(/(\w|\s)/g)) {
+                // if character key, update
+                Document.update(event.key);
             }
-
-            Document.update(event.key);
         });
 
         this.editor.focus();
