@@ -6,10 +6,8 @@ import {
 import Cursor from "../utils/cursor";
 import insertText from "../utils/text";
 
-// TODO: handle nested italic
-
-const Bold = {
-    regex: /(\*{2,3})(.+?)(\1)/g,
+const Strikethrough = {
+    regex: /(~{2})(.+?)(\1)/g,
     offset: 2,
     execute: function () {
         let sel = window.getSelection();
@@ -29,11 +27,11 @@ const Bold = {
                 selectionRange = getSurroundingWord(cText, cOffset);
             }
             const selection = selectContentInActiveRange(selectionRange);
-            if (selection === "****" || selection === "**") {
+            if (selection === "~~~~") {
                 return;
             }
 
-            insertText(node, `**${selection}**`);
+            insertText(node, `~~${selection}~~`);
 
             if (!selection) {
                 // if the selection is empty (not near a word)
@@ -72,4 +70,4 @@ const Bold = {
     },
 };
 
-export default Bold;
+export default Strikethrough;

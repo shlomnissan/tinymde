@@ -32,14 +32,21 @@ const Editor = {
         });
 
         this.editor.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" || event.key === "Backspace") {
+            if (event.key === "Enter") {
                 event.preventDefault();
-                event.key === "Enter"
-                    ? Document.insertParagraph()
-                    : Document.removeParagraph();
+                Document.insertParagraph();
             }
 
-            if (String.fromCharCode(event.keyCode).match(/(\w|\s)/g)) {
+            if (event.key === "Backspace") {
+                if (Document.removeParagraph()) {
+                    event.preventDefault();
+                }
+            }
+
+            if (
+                String.fromCharCode(event.keyCode).match(/(\w|\s|À|~)/g) ||
+                event.key === "Backspace"
+            ) {
                 // if character key, update
                 Document.update(event.key);
             }
@@ -59,6 +66,7 @@ const Editor = {
                 Commands.Bold.execute();
                 break;
             case "strikethrough":
+                Commands.Strikethrough.execute();
                 break;
             case "italic":
                 break;

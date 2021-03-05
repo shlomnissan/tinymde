@@ -339,12 +339,12 @@ function processHTML(text, type, metadata) {
     }
 
     const regex = {
-        bold: Commands.Bold.regex,
         italic: /(?<=(\*\*|\s|^))\*{1}([^\*].+?)(\*{1})(?=(\*\*|\s|$))/g,
     };
 
-    str = str.replace(regex.bold, "<strong>$&</strong>");
+    str = str.replace(Commands.Bold.regex, "<strong>$&</strong>");
     str = str.replace(regex.italic, "<em>$&</em>");
+    str = str.replace(Commands.Strikethrough.regex, "<strike>$&</strike>");
 
     return str;
 }
