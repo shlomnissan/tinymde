@@ -3,10 +3,13 @@ import Commands from "./commands/commands";
 import Document from "./document";
 
 const Editor = {
+    didInit: false,
     editor: document.createElement("div"),
     callbacks: {},
 
     init: function (root) {
+        if (this.didInit) return;
+        this.didInit = true;
         this.editor.id = "tinymde-editor";
         this.editor.contentEditable = true;
         this.editor.spellcheck = false;
