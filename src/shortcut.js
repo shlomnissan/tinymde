@@ -1,14 +1,16 @@
 let didInitialize = false;
 
-const activeModifiers = new Set();
+let thisContainer = null;
 
-const activeKeys = new Set();
+let activeModifiers = new Set();
 
-const keyWatch = {};
+let activeKeys = new Set();
 
-const callbacks = {};
+let keyWatch = {};
 
-const deferred = [];
+let callbacks = {};
+
+let deferred = [];
 
 const modifiersMap = {
     shift: 16,
@@ -30,15 +32,12 @@ const modifiers = [
 /**
  * Add keyboard event listeners if needed.
  */
-export function initializeShortcuts(container) {
+export function initShortcuts(container) {
     if (!didInitialize) {
         didInitialize = true;
-        container.addEventListener("keydown", (event) => {
-            handleKeyDown(event);
-        });
-        container.addEventListener("keyup", (event) => {
-            handleKeyUp(event);
-        });
+        thisContainer = container;
+        thisContainer.addEventListener("keydown", handleKeyDown);
+        thisContainer.addEventListener("keyup", handleKeyUp);
         deferred.forEach((shortcut) => {
             Shortcut(shortcut.keys, shortcut.callback);
             delete deferred[shortcut];
@@ -46,6 +45,21 @@ export function initializeShortcuts(container) {
     } else {
         console.error("TinyMDE: shortcuts are already initialized.");
     }
+}
+
+/**
+ * Remove event listeners and clear callbacks.
+ */
+export function deinitShortcuts() {
+    thisContainer.removeEventListener("keydown", handleKeyDown);
+    thisContainer.removeEventListener("keyup", handleKeyUp);
+
+    activeModifiers = new Set();
+    activeKeys = new Set();
+    keyWatch = {};
+    callbacks = {};
+
+    didInitialize = false;
 }
 
 /**

@@ -11,13 +11,15 @@ const __config = {
     toggleToolbar: false,
 };
 
+let root = null;
+
 /**
  * TinyMDE object.
  * @constructor
  * @param {string} editorSelector - The class name or id of the root container.
  */
 const TinyMDE = function (editorSelector, config = {}) {
-    const root = document.querySelector(editorSelector);
+    root = document.querySelector(editorSelector);
     if (!root) {
         console.error(`TinyMDE: '${editorSelector}' isn't a valid selector.`);
         return;
@@ -84,6 +86,15 @@ TinyMDE.prototype.executeCommand = function (command, value = "") {
  */
 TinyMDE.prototype.registerShortcut = function (keys, callback) {
     Shortcut(keys, callback);
+};
+
+/**
+ * Cleanup.
+ */
+TinyMDE.prototype.destroy = function () {
+    Editor.destroy();
+    root.removeChild(Editor.editor);
+    root.removeChild(Toolbar.toolbar);
 };
 
 function validateConfig(config) {

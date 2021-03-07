@@ -1,4 +1,4 @@
-import Shortcut, { initializeShortcuts } from "./shortcut";
+import Shortcut, { initShortcuts, deinitShortcuts } from "./shortcut";
 import Commands from "./commands/commands";
 import Document from "./document";
 
@@ -14,7 +14,7 @@ const Editor = {
         Document.init(this.editor);
 
         root.append(this.editor);
-        initializeShortcuts(this.editor);
+        initShortcuts(this.editor);
         dispatchCallbacks(this.editor, this.callbacks);
         clipboardPaste(this.editor);
         addShortcuts.apply(this);
@@ -89,7 +89,11 @@ const Editor = {
                 console.error(`TinyMDE: ${command} is an invalid command.`);
                 break;
         }
-        //Document.update(" "); // " " forced update
+        Document.update(" "); // " " forced update
+    },
+
+    destroy: function () {
+        deinitShortcuts();
     },
 };
 
