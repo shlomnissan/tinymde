@@ -1,17 +1,17 @@
 # TinyMDE
-TinyMDE is a simple markdown editor with a tiny footprint. It has minimal dependencies and a collection of powerful features designed to improve the writing experience on the web.
+TinyMDE is a simple markdown editor with syntax highlighting and a tiny footprint. It has NO dependencies and it provides powerful features designed to improve the writing experiences on the web.
 
 ## Features:
 
 * Tiny footprint.
+* Written in plain JavaScript.
+* Syntax highlighting.
 * Markdown toggle.
 * Keyboard shortcuts.
-* Full-screen mode.
 * Inline image uploads (drag/drop)
 * Tabs to space.
 * New list items.
 * Extensible.
-* Syntax highlighting.
 
 ## Getting started:
 
@@ -92,3 +92,19 @@ Supported modifiers:
 - `alt`, `option`
 - `ctrl`, `control`
 - `cmd`, `command`
+
+- - -
+
+### destory()
+
+This function deletes the HTML element TinyMDE injects, and reset the shortcut helper.
+
+If you're using TinyMDE in the context of a single page application, you should call this function when the page/component that initialized it is destroyed:
+
+```js
+useEffect(() => {
+    tinyMDE = new TinyMDE("#tinymde");
+    tinyMDE.setContent(content);
+    return () => tinyMDE.current.destroy();
+}, []);
+```
