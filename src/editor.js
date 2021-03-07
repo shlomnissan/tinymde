@@ -3,13 +3,10 @@ import Commands from "./commands/commands";
 import Document from "./document";
 
 const Editor = {
-    didInit: false,
     editor: document.createElement("div"),
     callbacks: {},
 
     init: function (root) {
-        if (this.didInit) return;
-        this.didInit = true;
         this.editor.id = "tinymde-editor";
         this.editor.contentEditable = true;
         this.editor.spellcheck = false;
@@ -22,17 +19,19 @@ const Editor = {
         clipboardPaste(this.editor);
         addShortcuts.apply(this);
 
-        Object.defineProperty(this, "content", {
-            get: function () {
-                return this.editor.innerText;
-            },
-            set: function (val) {
-                Document.reset(val);
-                Document.render(this.editor);
-            },
-            configurable: false,
-            enumerable: false,
-        });
+        if (!("content" in this)) {
+            Object.defineProperty(this, "content", {
+                get: function () {
+                    return this.editor.innerText;
+                },
+                set: function (val) {
+                    Document.reset(val);
+                    Document.render(this.editor);
+                },
+                configurable: false,
+                enumerable: false,
+            });
+        }
 
         this.editor.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
@@ -51,7 +50,9 @@ const Editor = {
                 event.key === "Backspace"
             ) {
                 // if character key, update
-                Document.update(event.key);
+                setTimeout(() => {
+                    Document.update(event.key);
+                });
             }
         });
 
@@ -88,7 +89,7 @@ const Editor = {
                 console.error(`TinyMDE: ${command} is an invalid command.`);
                 break;
         }
-        Document.update(" "); // " " forced update
+        //Document.update(" "); // " " forced update
     },
 };
 

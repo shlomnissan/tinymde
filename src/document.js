@@ -7,11 +7,14 @@ const Document = {
     lastNode: 0,
 
     /**
-     * Initialization - set the document render target.
+     * Initialization - set the document render target
+     * and render and empty node.
      * @param {HTMLElement} editor
      */
     init: function (editor) {
         this.editor = editor;
+        this.root[++this.lastNode] = createNode("");
+        this.render();
     },
 
     /**
@@ -112,22 +115,21 @@ const Document = {
             Cursor.setCurrentCursorPosition(cursorPos, el);
         };
 
-        setTimeout(() => {
-            updateNode(node, el.innerText);
+        if (!el) return;
+        updateNode(node, el.innerText);
 
-            // if space key, re-render the node
-            if (key === " ") {
-                triggerUpdate();
-                return;
-            }
+        // if space key, re-render the node
+        if (key === " ") {
+            triggerUpdate();
+            return;
+        }
 
-            // if children element count changed, re-render the node
-            const newEl = document.createElement("div");
-            newEl.innerHTML = node.html;
-            if (newEl.childElementCount !== el.childElementCount) {
-                triggerUpdate();
-            }
-        });
+        // if children element count changed, re-render the node
+        const newEl = document.createElement("div");
+        newEl.innerHTML = node.html;
+        if (newEl.childElementCount !== el.childElementCount) {
+            triggerUpdate();
+        }
     },
 
     /**
@@ -206,7 +208,10 @@ function getSelection() {
     const sel = window.getSelection();
     const el = getActiveParagraph();
 
-    if (!sel || !el) return;
+    if (!sel || !el) {
+        console.error("TinyMDE: Unable to process selection.");
+        return;
+    }
 
     const range = sel.getRangeAt(0);
     const isCollapsed = sel.isCollapsed;
@@ -239,8 +244,19 @@ export function getActiveParagraph() {
         container = container.parentElement;
     }
     while (!container.classList.contains("tinymde-paragraph")) {
-        if (container.parentElement === null) return;
+        if (container.parentElement === null) {
+            container = null;
+            break;
+        }
         container = container.parentElement;
+    }
+    if (!container) {
+        // if unable to select an active paragraph
+        // return the first one
+        const paragraphs = document.querySelectorAll(".tinymde-paragraph");
+        if (paragraphs.length) {
+            container = paragraphs[0];
+        }
     }
     return container;
 }

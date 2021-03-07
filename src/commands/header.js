@@ -16,14 +16,12 @@ const Header = {
             const stripped = stripParagraphMarkdown(text);
             text = `${"#".repeat(size)} ${stripped.text}`;
             para.innerText = text;
-            Document.update();
             offset = pos + offset - stripped.offset;
         };
 
         const stripMarkdown = () => {
             text = text.substring(offset, text.length);
             para.innerText = text;
-            Document.update();
             offset = pos - offset;
         };
 
