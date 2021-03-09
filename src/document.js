@@ -108,7 +108,7 @@ const Document = {
         const node = this.root[info.startNode];
         const el = getElementWithNid(info.startNode);
 
-        const triggerUpdate = () => {
+        const triggerUpdate = function () {
             // HTML structure changed, trigger re-render
             const cursorPos = Cursor.getCurrentCursorPosition(el);
             el.innerHTML = node.html;
@@ -124,12 +124,10 @@ const Document = {
             return;
         }
 
-        // if children element count changed, re-render the node
+        // TODO: compare HTML (including classes) before triggering an update
         const newEl = document.createElement("div");
         newEl.innerHTML = node.html;
-        if (newEl.childElementCount !== el.childElementCount) {
-            triggerUpdate();
-        }
+        triggerUpdate();
     },
 
     /**
@@ -358,9 +356,39 @@ function processHTML(text, type, metadata) {
         italic: /(?<=(\*\*|\s|^))\*{1}([^\*].+?)(\*{1})(?=(\*\*|\s|$))/g,
     };
 
-    str = str.replace(Commands.Bold.regex, "<strong>$&</strong>");
-    str = str.replace(regex.italic, "<em>$&</em>");
-    str = str.replace(Commands.Strikethrough.regex, "<strike>$&</strike>");
+    str = str.replace(Commands.Bold.regex, `<span class="md-strong">$&</span>`);
+    str = str.replace(regex.italic, `<span class="md-emphasize">$&</span>`);
+    str = str.replace(
+        Commands.Strikethrough.regex,
+        `<span class="md-strike">$&</span>`
+    );
+
+    return mergeNestedMarkdown(str);
+}
+
+function mergeNestedMarkdown(str) {
+    const nestedMatches = str.match(
+        /((<span class="(md-[a-z-]+)?">)(~~|\*\*|\*)){2,5}(.[^<]+)((~~|\*\*|\*)<\/span>)+/g
+    );
+
+    nestedMatches?.forEach(function (match) {
+        const it = match.matchAll(/<span class="([a-zA-Z-]+)">/g);
+        let group = it.next();
+        const classes = new Set();
+        while (!group.done) {
+            classes.add(group.value[1]);
+            group = it.next();
+        }
+
+        let classesStr = "";
+        classes.forEach((str) => {
+            classesStr += str + " ";
+        });
+
+        let text = match.replace(/<span class="[a-zA-Z-\s]+">/g, "");
+        text = text.replace(/<\/span>/g, "");
+        str = str.replace(match, `<span class="${classesStr}">${text}</span>`);
+    });
 
     return str;
 }

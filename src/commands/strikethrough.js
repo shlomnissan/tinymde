@@ -52,11 +52,10 @@ const Strikethrough = {
         };
 
         const stripMarkdown = () => {
-            selectContentInActiveRange({
-                start: 0,
-                end: node.innerText.length,
-            });
-            node.innerText = match[0].replace(this.regex, "$2");
+            node.innerText = node.innerText.replace(
+                match[0],
+                match[0].replace(this.regex, "$2")
+            );
             const len = match[0].length;
             const offset = Math.min(cOffset, len - this.offset);
             Cursor.setCurrentCursorPosition(
