@@ -78,6 +78,7 @@ const Editor = {
                 Commands.Header.execute(value);
                 break;
             case "unordered-list":
+                Commands.UnorderedList.execute();
                 break;
             case "ordered-list":
                 break;

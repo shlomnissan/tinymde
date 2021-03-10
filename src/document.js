@@ -6,6 +6,7 @@ const NodeType = {
     NEW_LINE: "new-line",
     HEADER: "header",
     BLOCKQUOTE: "blockquote",
+    UNORDERED_LIST: "unordered_list",
 };
 
 const Document = {
@@ -297,6 +298,10 @@ function getNodeType(para) {
         return { type: NodeType.BLOCKQUOTE, metadata: {} };
     }
 
+    if (para.match(Commands.UnorderedList.regex)) {
+        return { type: NodeType.UNORDERED_LIST, metadata: {} };
+    }
+
     return { type: NodeType.TEXT, metadata: {} };
 }
 
@@ -363,18 +368,17 @@ function processHTML(text, type, metadata) {
     text = text.replace(/</g, "&lt;");
     text = text.replace(/>/g, "&gt;");
 
-    if (type === NodeType.TEXT) str = text;
-
-    if (type === NodeType.NEW_LINE) str = "<br>";
-
-    if (type === NodeType.HEADER) {
-        const content = text.substr(metadata.len + 1);
-        const gutter = "#".repeat(metadata.len) + " ";
-        str = `<strong><span class="gutter">${gutter}</span>${content}</strong>`;
-    }
-
-    if (type === NodeType.BLOCKQUOTE) {
-        str = text;
+    switch (type) {
+        case NodeType.NEW_LINE:
+            str = "<br>";
+            break;
+        case NodeType.HEADER:
+            const content = text.substr(metadata.len + 1);
+            const gutter = "#".repeat(metadata.len) + " ";
+            str = `<strong><span class="gutter">${gutter}</span>${content}</strong>`;
+            break;
+        default:
+            str = text;
     }
 
     const regex = {

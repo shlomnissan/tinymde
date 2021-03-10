@@ -13,10 +13,10 @@ const Blockquote = {
         const pos = Cursor.getCurrentCursorPosition(para);
 
         const addMarkdown = () => {
-            const stripped = stripParagraphMarkdown(text);
-            text = `> ${stripped.text}`;
+            const info = stripParagraphMarkdown(text);
+            text = `> ${info.text}`;
             para.innerText = text;
-            offset = pos + offset - stripped.offset;
+            offset = pos + offset - info.offset;
         };
 
         const stripMarkdown = () => {

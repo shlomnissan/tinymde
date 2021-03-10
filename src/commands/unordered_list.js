@@ -2,20 +2,19 @@ import { stripParagraphMarkdown, selectContentInElement } from "../utils/text";
 import { getActiveParagraph } from "../document";
 import Cursor from "../utils/cursor";
 
-const Header = {
-    regex: /^(#{1,6})\s/g,
-    execute(size) {
+const UnorderedList = {
+    regex: /^-\s/g,
+    execute() {
         const para = getActiveParagraph();
         if (!para) return;
 
-        let offset = size + 1;
+        let offset = 2;
         let text = para.innerText;
         const pos = Cursor.getCurrentCursorPosition(para);
-        const regex = new RegExp(`^(\\#{${size}}\\s)(.*?)`, "g");
 
         const addMarkdown = () => {
             const info = stripParagraphMarkdown(text);
-            text = `${"#".repeat(size)} ${info.text}`;
+            text = `- ${info.text}`;
             para.innerText = text;
             offset = pos + offset - info.offset;
         };
@@ -27,10 +26,10 @@ const Header = {
         };
 
         selectContentInElement(para);
-        const match = text.match(regex);
+        const match = text.match(this.regex);
         match ? stripMarkdown() : addMarkdown();
         Cursor.setCurrentCursorPosition(offset, para);
     },
 };
 
-export default Header;
+export default UnorderedList;

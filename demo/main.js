@@ -7,6 +7,10 @@ TinyMDEInstance.setContent(`# Backward-compatibility over performance in C++
 
 Most programmers use C++ for its promise of performance above all, but in the last decade, performance has been deprioritized, and the consequences can prove detrimental to the future of the language.
 
+- List entry 1
+- List entry 2
+- List entry 3
+
 The current implementation of the standard associative containers is outdated. Since they were added to the library in C++11 a lot of research has been done on hashing techniques. Some 3rd-party implementations boast performance improvements of 200%-300% on average! Unfortunately, we are not expecting to see these improvements in the standard library anytime soon.
 
 The suboptimal performance o8f these containers is an extreme case but other library and language facilities can be substantially improved (an estimated 5%-10% improvement to the performance of the language overall). So why do we keep adding new features to the language without addressing bottlenecks first?

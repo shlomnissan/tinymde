@@ -210,10 +210,10 @@ export function selectContentInElement(element) {
 }
 
 /**
+ * Checks text for paragraph markdown and removes it.
  */
 export function stripParagraphMarkdown(text) {
-    const regex = new RegExp(`^(\\#{1,6}\\s)|(\\>\\s)(.*?)`, "g");
-    const match = text.match(regex);
+    const match = text.match(/^(?:(#{1,6}\s)|(>\s)|(-\s))/g);
     if (match) {
         const offset = match[0].length;
         return {
