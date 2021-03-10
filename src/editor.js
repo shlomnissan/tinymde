@@ -82,6 +82,7 @@ const Editor = {
             case "ordered-list":
                 break;
             case "blockquote":
+                Commands.Blockquote.execute();
                 break;
             case "link":
                 break;
@@ -158,6 +159,11 @@ function addShortcuts() {
         event.preventDefault();
         this.executeCommand("header", 6);
     });
+    Shortcut("ctrl+0", (event) => {
+        event.preventDefault();
+        this.executeCommand("blockquote");
+    });
+
     Shortcut("ctrl+l", (event) => {
         event.preventDefault();
         this.executeCommand("unordered-list");

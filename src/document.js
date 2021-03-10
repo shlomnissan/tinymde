@@ -5,6 +5,7 @@ const NodeType = {
     TEXT: "text",
     NEW_LINE: "new-line",
     HEADER: "header",
+    BLOCKQUOTE: "blockquote",
 };
 
 const Document = {
@@ -123,6 +124,12 @@ const Document = {
 
         if (!el) return;
         updateNode(node, el.innerText);
+        el.classList.forEach((classStr) => {
+            if (classStr !== "tinymde-paragraph") {
+                el.classList.remove(classStr);
+            }
+        });
+        el.classList.add(`tinymde-${node.type}`);
 
         // if space key, re-render the node
         if (key === " ") {
@@ -202,7 +209,8 @@ const Document = {
     render: function () {
         let output = "";
         Object.keys(this.dom).forEach((nid) => {
-            output += `<div class="tinymde-paragraph" data-nid="${nid}">${this.dom[nid].html}</div>`;
+            const classes = `tinymde-${this.dom[nid].type}`;
+            output += `<div class="tinymde-paragraph ${classes}" data-nid="${nid}">${this.dom[nid].html}</div>`;
         });
         this.editor.innerHTML = output;
     },
@@ -285,6 +293,10 @@ function getNodeType(para) {
         return { type: NodeType.HEADER, metadata: { len } };
     }
 
+    if (para.match(Commands.Blockquote.regex)) {
+        return { type: NodeType.BLOCKQUOTE, metadata: {} };
+    }
+
     return { type: NodeType.TEXT, metadata: {} };
 }
 
@@ -352,11 +364,17 @@ function processHTML(text, type, metadata) {
     text = text.replace(/>/g, "&gt;");
 
     if (type === NodeType.TEXT) str = text;
+
     if (type === NodeType.NEW_LINE) str = "<br>";
+
     if (type === NodeType.HEADER) {
         const content = text.substr(metadata.len + 1);
         const gutter = "#".repeat(metadata.len) + " ";
         str = `<strong><span class="gutter">${gutter}</span>${content}</strong>`;
+    }
+
+    if (type === NodeType.BLOCKQUOTE) {
+        str = text;
     }
 
     const regex = {
