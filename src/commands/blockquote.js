@@ -4,11 +4,12 @@ import Cursor from "../utils/cursor";
 
 const Blockquote = {
     regex: /^>\s/g,
+    offset: 2,
     execute() {
         const para = getActiveParagraph();
         if (!para) return;
 
-        let offset = 2;
+        let offset = this.offset;
         let text = para.innerText;
         const pos = Cursor.getCurrentCursorPosition(para);
 

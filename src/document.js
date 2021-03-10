@@ -51,6 +51,7 @@ const Document = {
         const info = getSelection();
         const nid = info.startNode;
         const node = this.dom[nid];
+        let offset = 0;
 
         if (info.isCollapsed) {
             if (info.startOffset === 0) {
@@ -59,20 +60,24 @@ const Document = {
                 insertNode.call(this, nextNid, createNode(""));
             } else if (info.startPos === node.text.length) {
                 // add empty paragraph below
-                insertNode.call(this, nid + 1, createNode(""));
+                insertNode.call(
+                    this,
+                    nid + 1,
+                    createNode(addMarkdownIfNeeded(""))
+                );
             } else {
                 // add paragraph below with content from the selection until the end
                 const node = this.dom[info.startNode];
                 const first = node.text.substr(0, info.startPos);
                 const second = node.text.substr(info.startPos);
-                split.call(this, first, second);
+                split.call(this, first, addMarkdownIfNeeded(second));
             }
         } else {
             if (info.startNode === info.endNode) {
                 // add paragraph below, remove selected text in a single node
                 const first = node.text.substr(0, info.startPos);
                 const second = node.text.substr(info.endPos);
-                split.call(this, first, second);
+                split.call(this, first, addMarkdownIfNeeded(second));
             } else {
                 // add paragraph below, remove selected text on multiple nodes
                 const range = window.getSelection().getRangeAt(0);
@@ -88,13 +93,27 @@ const Document = {
             }
         }
 
+        function addMarkdownIfNeeded(text) {
+            if (node.type === NodeType.UNORDERED_LIST) {
+                // previous node is an unordered list
+                if (node.text.length > Commands.UnorderedList.offset) {
+                    offset = Commands.UnorderedList.offset;
+                    return "- " + text;
+                } else {
+                    // if the list node is empty, clear list
+                    updateNode(node, "");
+                }
+            }
+            return text;
+        }
+
         function split(first, second) {
             updateNode(this.dom[nid], first);
             insertNode.call(this, nid + 1, createNode(second));
         }
 
         this.render();
-        Cursor.setCurrentCursorPosition(0, getElementWithNid(nid + 1));
+        Cursor.setCurrentCursorPosition(offset, getElementWithNid(nid + 1));
     },
 
     /**
