@@ -1,9 +1,9 @@
 import { stripParagraphMarkdown, selectContentInElement } from "../utils/text";
-import Document, { getActiveParagraph } from "../document";
+import { getActiveParagraph } from "../document";
 import Cursor from "../utils/cursor";
 
 const Header = {
-    regex: /^(\#{1,6}\s)(.*)/g,
+    regex: /^(#{1,6})\s/g,
     execute(size) {
         const para = getActiveParagraph();
         if (!para) return;

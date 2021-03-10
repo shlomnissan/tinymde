@@ -1,8 +1,14 @@
 import Cursor from "./utils/cursor";
 import Commands from "./commands/commands";
 
+const NodeType = {
+    TEXT: "text",
+    NEW_LINE: "new-line",
+    HEADER: "header",
+};
+
 const Document = {
-    root: {},
+    dom: {},
     editor: null,
     lastNode: 0,
 
@@ -13,7 +19,7 @@ const Document = {
      */
     init: function (editor) {
         this.editor = editor;
-        this.root[++this.lastNode] = createNode("");
+        this.dom[++this.lastNode] = createNode("");
         this.render();
     },
 
@@ -23,12 +29,12 @@ const Document = {
      * @param {string} content
      */
     reset: function (content) {
-        this.root = {};
+        this.dom = {};
         this.lastNode = 0;
         const paragraphs = content.split(/\n/gm);
         paragraphs.forEach((para) => {
             const nid = ++this.lastNode;
-            this.root[nid] = createNode(para);
+            this.dom[nid] = createNode(para);
         });
         if (paragraphs.length) {
             this.render();
@@ -42,7 +48,7 @@ const Document = {
     insertParagraph: function () {
         const info = getSelection();
         const nid = info.startNode;
-        const node = this.root[nid];
+        const node = this.dom[nid];
 
         if (info.isCollapsed) {
             if (info.startOffset === 0) {
@@ -54,7 +60,7 @@ const Document = {
                 insertNode.call(this, nid + 1, createNode(""));
             } else {
                 // add paragraph below with content from the selection until the end
-                const node = this.root[info.startNode];
+                const node = this.dom[info.startNode];
                 const first = node.text.substr(0, info.startPos);
                 const second = node.text.substr(info.startPos);
                 split.call(this, first, second);
@@ -71,17 +77,17 @@ const Document = {
                 range.deleteContents();
 
                 const startContainer = getElementWithNid(info.startNode);
-                updateNode(this.root[info.startNode], startContainer.innerText);
+                updateNode(this.dom[info.startNode], startContainer.innerText);
 
                 const endContainer = getElementWithNid(info.endNode);
-                updateNode(this.root[info.endNode], endContainer.innerText);
+                updateNode(this.dom[info.endNode], endContainer.innerText);
 
                 removeNode.call(this, info.startNode, info.endNode);
             }
         }
 
         function split(first, second) {
-            updateNode(this.root[nid], first);
+            updateNode(this.dom[nid], first);
             insertNode.call(this, nid + 1, createNode(second));
         }
 
@@ -105,7 +111,7 @@ const Document = {
         }
 
         const info = getSelection();
-        const node = this.root[info.startNode];
+        const node = this.dom[info.startNode];
         const el = getElementWithNid(info.startNode);
 
         const triggerUpdate = function () {
@@ -148,14 +154,14 @@ const Document = {
         }
 
         if (!isMultiNode) {
-            const node = this.root[info.startNode];
-            const prevNode = this.root[info.startNode - 1];
+            const node = this.dom[info.startNode];
+            const prevNode = this.dom[info.startNode - 1];
             cursorOffset = prevNode.text.length;
-            if (node.type !== "new-line") {
+            if (node.type !== NodeType.NEW_LINE) {
                 if (info.startNode === 1) return true;
                 // copy current paragraph content to the one above
                 updateNode(
-                    this.root[info.startNode - 1],
+                    this.dom[info.startNode - 1],
                     prevNode.text + node.text
                 );
             }
@@ -174,7 +180,7 @@ const Document = {
             cursorOffset = startContainer.innerText.length;
 
             updateNode(
-                this.root[startNode],
+                this.dom[startNode],
                 startContainer.innerText + endContainer.innerText
             );
 
@@ -195,8 +201,8 @@ const Document = {
      */
     render: function () {
         let output = "";
-        Object.keys(this.root).forEach((nid) => {
-            output += `<div class="tinymde-paragraph" data-tnode="${nid}">${this.root[nid].html}</div>`;
+        Object.keys(this.dom).forEach((nid) => {
+            output += `<div class="tinymde-paragraph" data-nid="${nid}">${this.dom[nid].html}</div>`;
         });
         this.editor.innerHTML = output;
     },
@@ -262,7 +268,7 @@ export function getActiveParagraph() {
 function getElementWithNid(nid) {
     const paragraphs = document.querySelectorAll(".tinymde-paragraph");
     for (let i = 0; i < paragraphs.length; ++i) {
-        if (paragraphs[i].dataset.tnode == nid) {
+        if (paragraphs[i].dataset.nid == nid) {
             return paragraphs[i];
         }
     }
@@ -271,21 +277,22 @@ function getElementWithNid(nid) {
 
 function getNodeType(para) {
     if (para.length == 0) {
-        return { type: "new-line", metadata: {} };
+        return { type: NodeType.NEW_LINE, metadata: {} };
     }
-    // TODO: generalize header
-    if (para.match(/^(#{1,6})\s/g)) {
-        const len = /^(#{1,6})\s/g.exec(para)[1].length;
-        return { type: "header", metadata: { len } };
+
+    if (para.match(Commands.Header.regex)) {
+        const len = Commands.Header.regex.exec(para)[1].length;
+        return { type: NodeType.HEADER, metadata: { len } };
     }
-    return { type: "text", metadata: {} };
+
+    return { type: NodeType.TEXT, metadata: {} };
 }
 
 function getNearestNidWithElement(el) {
     while (el && !el.classList?.contains("tinymde-paragraph")) {
         el = el.parentElement;
     }
-    return el ? el.dataset.tnode : -1;
+    return el ? el.dataset.nid : -1;
 }
 
 function createNode(text) {
@@ -310,14 +317,14 @@ function updateNode(node, text) {
 function insertNode(nid, node) {
     const newRoot = {};
     for (let i = 1; i < nid; ++i) {
-        newRoot[i] = this.root[i];
+        newRoot[i] = this.dom[i];
     }
     newRoot[nid] = node;
-    for (let i = nid; i <= Object.keys(this.root).length; ++i) {
-        newRoot[i + 1] = this.root[i];
+    for (let i = nid; i <= Object.keys(this.dom).length; ++i) {
+        newRoot[i + 1] = this.dom[i];
     }
-    this.root = newRoot;
-    updateNode(this.root[nid], node.text);
+    this.dom = newRoot;
+    updateNode(this.dom[nid], node.text);
 }
 
 // TODO: removeNode and removeNodeInRange
@@ -326,13 +333,13 @@ function removeNode(fromNid, toNid) {
     const newRoot = {};
     let idx = 1;
     for (; idx <= fromNid; ++idx) {
-        newRoot[idx] = this.root[idx];
+        newRoot[idx] = this.dom[idx];
     }
-    const len = Object.keys(this.root).length;
+    const len = Object.keys(this.dom).length;
     for (let i = toNid; i <= len; ++i) {
-        newRoot[idx++] = this.root[i];
+        newRoot[idx++] = this.dom[i];
     }
-    this.root = newRoot;
+    this.dom = newRoot;
     return toNid - removedNodes - 1;
 }
 
@@ -344,9 +351,9 @@ function processHTML(text, type, metadata) {
     text = text.replace(/</g, "&lt;");
     text = text.replace(/>/g, "&gt;");
 
-    if (type === "text") str = text;
-    if (type === "new-line") str = "<br>";
-    if (type === "header") {
+    if (type === NodeType.TEXT) str = text;
+    if (type === NodeType.NEW_LINE) str = "<br>";
+    if (type === NodeType.HEADER) {
         const content = text.substr(metadata.len + 1);
         const gutter = "#".repeat(metadata.len) + " ";
         str = `<strong><span class="gutter">${gutter}</span>${content}</strong>`;
