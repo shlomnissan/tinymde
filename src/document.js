@@ -133,7 +133,9 @@ const Document = {
 
         const info = getSelection();
         const node = this.dom[info.startNode];
+        const currType = node.type;
         const el = getElementWithNid(info.startNode);
+        if (!el) return;
 
         const triggerUpdate = function () {
             // HTML structure changed, trigger re-render
@@ -142,16 +144,31 @@ const Document = {
             Cursor.setCurrentCursorPosition(cursorPos, el);
         };
 
-        if (!el) return;
-        updateNode(node, el.innerText);
-        el.classList.forEach((classStr) => {
-            if (classStr !== "tinymde-paragraph") {
-                el.classList.remove(classStr);
+        if (key === "Backspace") {
+            // clear empty list entry
+            if (
+                node.type === NodeType.UNORDERED_LIST &&
+                el.innerText.length === 1
+            ) {
+                updateNode(node, "");
+                el.innerHTML = node.html;
+                return;
             }
-        });
-        el.classList.add(`tinymde-${node.type}`);
+        }
 
-        // if space key, re-render the node
+        updateNode(node, el.innerText);
+
+        if (currType !== node.type) {
+            // type was changed, update paragraph classList
+            el.classList.forEach((classStr) => {
+                if (classStr !== "tinymde-paragraph") {
+                    el.classList.remove(classStr);
+                }
+            });
+            el.classList.add(`tinymde-${node.type}`);
+        }
+
+        // if space key, force re-render the node
         if (key === " ") {
             triggerUpdate();
             return;
