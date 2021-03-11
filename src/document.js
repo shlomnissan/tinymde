@@ -6,7 +6,8 @@ const NodeType = {
     NEW_LINE: "new-line",
     HEADER: "header",
     BLOCKQUOTE: "blockquote",
-    UNORDERED_LIST: "unordered_list",
+    UNORDERED_LIST: "unordered-list",
+    ORDERED_LIST: "ordered-list",
 };
 
 const Document = {
@@ -100,7 +101,20 @@ const Document = {
                     offset = Commands.UnorderedList.offset;
                     return "- " + text;
                 } else {
-                    // if the list node is empty, clear list
+                    // prev list node is empty, clear list
+                    updateNode(node, "");
+                }
+            }
+            if (node.type === NodeType.ORDERED_LIST) {
+                // previous node is an ordered list
+                const match = Commands.OrderedList.regex.exec(node.text);
+                const len = match[0].length;
+                if (node.text.length > len) {
+                    const next_item = parseInt(match[1]) + 1;
+                    offset = len;
+                    return `${next_item}. ` + text;
+                } else {
+                    // prev list node is empty, clear list
                     updateNode(node, "");
                 }
             }
@@ -336,6 +350,10 @@ function getNodeType(para) {
 
     if (para.match(Commands.UnorderedList.regex)) {
         return { type: NodeType.UNORDERED_LIST, metadata: {} };
+    }
+
+    if (para.match(Commands.OrderedList.regex)) {
+        return { type: NodeType.ORDERED_LIST, metadata: {} };
     }
 
     return { type: NodeType.TEXT, metadata: {} };

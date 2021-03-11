@@ -81,6 +81,7 @@ const Editor = {
                 Commands.UnorderedList.execute();
                 break;
             case "ordered-list":
+                Commands.OrderedList.execute();
                 break;
             case "blockquote":
                 Commands.Blockquote.execute();
@@ -164,10 +165,14 @@ function addShortcuts() {
         event.preventDefault();
         this.executeCommand("blockquote");
     });
-
     Shortcut("ctrl+l", (event) => {
         event.preventDefault();
         this.executeCommand("unordered-list");
+    });
+    // TODO: fix three-key shortcuts
+    Shortcut("ctrl+shift+l", (event) => {
+        event.preventDefault();
+        console.log("make ordered list");
     });
 }
 
